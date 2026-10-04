@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Drift Flow Matching · NeurIPS 2026</title>
+  <meta name="description" content="Drift Flow Matching connects one-step drifting generation with flexible multi-step refinement. Explore image generation, transport trajectories, and the official implementation.">
+  <meta property="og:title" content="Drift Flow Matching · NeurIPS 2026">
+  <meta property="og:description" content="One-step generation. Flexible multi-step refinement.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230d665c'/%3E%3Cpath d='M12 43Q30 8 52 21M12 50Q35 23 52 30' stroke='%23fff' stroke-width='5' fill='none'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#images">Skip to results</a>
+  <header class="nav"><a class="wordmark" href="#">DFM<span> / NeurIPS 2026</span></a><nav aria-label="Sections"><a href="#images">Images</a><a href="#trajectories">Trajectories</a><a href="#code">Code</a><a href="#citation">Cite</a></nav></header>
+  <main>
+    <section class="hero" aria-labelledby="title">
+      <p class="eyebrow">NeurIPS 2026</p>
+      <h1 id="title">Drift Flow Matching</h1>
+      <p class="tagline">One-step generation.<br><span>Flexible multi-step refinement.</span></p>
+      <p class="authors">Chenrui Ma<sup>1,2</sup> · Xi Xiao<sup>3</sup> · Lin Zhao<sup>4</sup><br>Tianyang Wang<sup>3</sup> · Ferdinando Fioretto<sup>2</sup> · Yanning Shen<sup>1</sup></p>
+      <p class="institutions"><span><sup>1</sup> UC Irvine</span><span><sup>2</sup> University of Virginia</span><span><sup>3</sup> University of Alabama at Birmingham</span><span><sup>4</sup> Northeastern University</span></p>
+      <div class="links"><a class="button primary" href="https://arxiv.org/abs/2605.17244">Read the paper <span aria-hidden="true">↗</span></a><a class="button" href="https://github.com/merry7cherry/drift-flow-matching">GitHub <span aria-hidden="true">↗</span></a><a class="button" href="#trajectories">Explore trajectories <span aria-hidden="true">↓</span></a></div>
+      <p class="intro">DFM connects drifting generative modeling with flow-based transport. A two-time model learns to move between intermediate distributions, allowing the same model to generate in one step or refine its output over multiple steps.</p>
+    </section>
+
+    <section id="images" class="section" aria-labelledby="images-title">
+      <div class="section-heading"><div><p class="eyebrow">01 / Image generation</p><h2 id="images-title">Choose your inference budget.</h2></div><p>Class-conditional FFHQ generation in a learned latent space, decoded at 1024 × 1024.</p></div>
+      <div class="toolbar"><span id="image-control-label">Number of function evaluations</span><div class="segmented" role="group" aria-labelledby="image-control-label"><button type="button" data-image-nfe="1" aria-pressed="true">1 NFE</button><button type="button" data-image-nfe="2" aria-pressed="false">2 NFE</button><button type="button" data-image-nfe="5" aria-pressed="false">5 NFE</button><button type="button" data-image-nfe="10" aria-pressed="false">10 NFE</button></div></div>
+      <figure class="image-frame"><img id="ffhq-image" src="assets/ffhq-nfe-1.jpg" width="1800" height="1026" alt="FFHQ class-conditional generated samples at one inference step"><figcaption><span id="image-caption" aria-live="polite">FFHQ · 1 NFE</span><span>Generated examples from the paper appendix. Columns are selected samples, not a verified paired-seed comparison.</span></figcaption></figure>
+      <p class="small-note">This release provides MNIST and FFHQ training, sampling, and evaluation code. Archived paper visuals and reported metrics are distinct from newly reproduced results; see the <a href="https://github.com/merry7cherry/drift-flow-matching/blob/main/reproduction/README.md">reproduction notes</a>.</p>
+    </section>
+
+    <section id="method" class="section method" aria-labelledby="method-title">
+      <p class="eyebrow">The idea</p><h2 id="method-title">Learn transport over an interval.</h2>
+      <div class="method-grid"><div><p>Flow Matching constructs a path from noise to data. DFM uses pairs of times along that path and a distribution-level drift objective to learn transport between their marginals.</p><p>During sampling, the model predicts a mean velocity over the chosen interval. A single interval gives direct generation; a sequence of intervals gives multi-step refinement.</p></div><div class="equation"><span class="equation-label">Two-time transport</span><p>x<sub>r</sub> = x<sub>t</sub> + (r − t) u<sub>θ</sub>(x<sub>t</sub>, t, r)</p><div class="interval" aria-label="A transport interval from time t to time r"><span>t</span><span class="interval-line"></span><span>r</span></div><p class="equation-note">Choose the interval. Reuse the same model.</p></div></div>
+    </section>
+
+    <section id="trajectories" class="section" aria-labelledby="trajectory-title">
+      <div class="section-heading"><div><p class="eyebrow">02 / Generation trajectories</p><h2 id="trajectory-title">See how samples travel.</h2></div><p>Explore the paper’s synthetic experiments. Blue points denote source samples; red points denote generated endpoints.</p></div>
+      <div class="trajectory-controls"><label>Target distribution<select id="dataset" aria-label="Target distribution"><option value="moon">Two moons</option><option value="checkerboard_grid">Checkerboard</option><option value="letter_f">Letter F</option><option value="letter_m">Letter M</option></select></label><label>Compare against<select id="reference" aria-label="Compare against"><option value="drift_flow_matching_steps_1">DFM · 1 NFE</option><option value="flow_matching">Flow Matching · 50 NFE</option><option value="mean_flow_steps_1">MeanFlow · 1 NFE</option><option value="mean_flow_steps_20">MeanFlow · 20 NFE</option><option value="drift">Drift Model · 1 NFE</option></select></label></div>
+      <div class="trajectory-grid"><figure><figcaption id="reference-title">DFM · 1 NFE</figcaption><img id="reference-image" src="assets/moon-drift_flow_matching_steps_1.jpg" width="1600" height="1421" loading="lazy" alt="One-step DFM trajectories toward two moons"></figure><figure><figcaption class="accent">DFM · 20 NFE</figcaption><img id="dfm-image" src="assets/moon-drift_flow_matching_steps_20.jpg" width="1600" height="1421" loading="lazy" alt="Twenty-step DFM trajectories toward two moons"></figure></div>
+      <p class="small-note" id="trajectory-caption" aria-live="polite">Two moons · archived paper visualization. These controls switch recorded figures; they do not run a model in your browser.</p>
+      <a class="text-link" href="https://github.com/merry7cherry/drift-flow-matching/tree/main/generation_trajectory">Run the trajectory code <span aria-hidden="true">→</span></a>
+    </section>
+
+    <section id="results" class="section" aria-labelledby="results-title"><p class="eyebrow">Reported results</p><h2 id="results-title">Additional steps improve the trade-off.</h2><p>Selected class-conditional results reported in the paper. EMD is squared Wasserstein-2 distance in latent space. FFHQ FID compares decoded generated and decoded real images using the same frozen ALAE decoder.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="MNIST and FFHQ results"><table><caption>MNIST and FFHQ · paper-reported metrics</caption><thead><tr><th scope="col">Method</th><th scope="col">NFE</th><th scope="col">MNIST EMD ↓</th><th scope="col">MNIST accuracy ↑</th><th scope="col">FFHQ EMD ↓</th><th scope="col">FFHQ FID ↓</th></tr></thead><tbody><tr><th scope="row">Flow Matching</th><td>50</td><td>37.2</td><td>100.0%</td><td>198.4</td><td>77.4</td></tr><tr><th scope="row">MeanFlow</th><td>1</td><td>68.6</td><td>96.7%</td><td>258.7</td><td>131.2</td></tr><tr><th scope="row">MeanFlow</th><td>5</td><td>37.5</td><td>100.0%</td><td>204.2</td><td>82.1</td></tr><tr><th scope="row">Drift Model</th><td>1</td><td>37.3</td><td>100.0%</td><td>225.5</td><td>116.2</td></tr><tr class="ours"><th scope="row">DFM</th><td>1</td><td>37.3</td><td>100.0%</td><td>225.5</td><td>116.2</td></tr><tr class="ours"><th scope="row">DFM</th><td>2</td><td>37.2</td><td>100.0%</td><td>215.7</td><td>80.4</td></tr><tr class="ours"><th scope="row">DFM</th><td>5</td><td>37.2</td><td>100.0%</td><td>196.2</td><td>75.9</td></tr></tbody></table></div>
+      <p class="small-note">Source: the paper’s MNIST / FFHQ comparison table. These values have not been re-measured with the public release.</p>
+    </section>
+
+    <section id="code" class="section" aria-labelledby="code-title"><p class="eyebrow">Explore the implementation</p><h2 id="code-title">Two ways to start.</h2><div class="code-grid"><article><span class="code-number">01</span><h3>Image generation</h3><p>Prepare MNIST or FFHQ latents, train DFM, sample at a chosen NFE, and evaluate with the documented protocol.</p><a class="text-link" href="https://github.com/merry7cherry/drift-flow-matching/tree/main/image_generation">Installation &amp; usage →</a></article><article><span class="code-number">02</span><h3>Generation trajectories</h3><p>Start with a small CPU example. Save a model, sample trajectories, and compare transport at different inference budgets.</p><a class="text-link" href="https://github.com/merry7cherry/drift-flow-matching/tree/main/generation_trajectory">Run the example →</a></article></div><p class="small-note">The initial release covers image generation and synthetic trajectories. Original paper checkpoints are not included.</p></section>
+
+    <section id="citation" class="section citation" aria-labelledby="citation-title"><div class="citation-heading"><h2 id="citation-title">Citation</h2><button type="button" id="copy-citation">Copy BibTeX</button></div><pre><code id="bibtex">@article{ma2026drift,
+  title   = {Drift Flow Matching},
+  author  = {Ma, Chenrui and Xiao, Xi and Zhao, Lin and Wang, Tianyang
+             and Fioretto, Ferdinando and Shen, Yanning},
+  journal = {arXiv preprint arXiv:2605.17244},
+  year    = {2026}
+}</code></pre><p id="copy-status" class="small-note" aria-live="polite"></p></section>
+  </main>
+  <footer><span>Drift Flow Matching · NeurIPS 2026</span><a href="https://github.com/merry7cherry/drift-flow-matching/blob/main/reproduction/assets.md">Figure sources</a><a href="mailto:chenrum@uci.edu">Contact</a><a href="https://github.com/merry7cherry/drift-flow-matching">Source code</a></footer>
+</body>
+</html>

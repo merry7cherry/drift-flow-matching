@@ -1,0 +1,7 @@
+# Public CPU validation environment (Python 3.11.15).
+# Use: python -m pip install -c constraints-tested.txt -e '.[eval,dev,data]'
+# Select the appropriate PyTorch CUDA wheel index separately for GPU execution.
+torch==2.8.0
+torchvision==0.23.0
+numpy==2.0.2
+matplotlib==3.9.4

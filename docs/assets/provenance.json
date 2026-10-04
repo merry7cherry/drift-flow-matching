@@ -1,0 +1,210 @@
+[
+  {
+    "asset": "moon-drift_flow_matching_steps_1.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_moon_drift_flow_matching_steps_1.jpg",
+    "source_sha256": "d698de545c5d09705109ed2d5056f2ba6667f3fe8c665c26b4320fb3b875bd3d",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "moon-drift_flow_matching_steps_20.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_moon_drift_flow_matching_steps_20.jpg",
+    "source_sha256": "3c2036bab1ee83bcda476c0db0c512f5c14981f9a1bed15651d11d8ac572665a",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "moon-flow_matching.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_moon_flow_matching.jpg",
+    "source_sha256": "9171659c3e987a3a71a9d4a83c528eab374ffca3a3e8be3a6d2af80ee4355300",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "moon-mean_flow_steps_1.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_moon_mean_flow_steps_1.jpg",
+    "source_sha256": "740ec5c2db7d232da84a84834dee2556ab73fa2a77bd3a4618d7ce748cca33d3",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "moon-mean_flow_steps_20.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_moon_mean_flow_steps_20.jpg",
+    "source_sha256": "9895a799275b7ca070f9bffc18e541d9f26c6fad2389024ab3b168b3590a2721",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "moon-drift.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_moon_drift.jpg",
+    "source_sha256": "0f35270aa3a9790216a5d6f46e14b4a1ac6d2db9e0047b81fe97a8395c72f763",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "checkerboard_grid-drift_flow_matching_steps_1.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_checkerboard_grid_drift_flow_matching_steps_1.jpg",
+    "source_sha256": "e631c3a72e95b19726c61b61960b40c2e396361045c8125ef0fc0c28202f9862",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "checkerboard_grid-drift_flow_matching_steps_20.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_checkerboard_grid_drift_flow_matching_steps_20.jpg",
+    "source_sha256": "a81a6200ccf31918611f574c795fcac7ac235f59333899a5e640978247ec6e40",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "checkerboard_grid-flow_matching.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_checkerboard_grid_flow_matching.jpg",
+    "source_sha256": "cbb6426f6e8d8d5d737c8676e194ccf82b2204d9c4f21b0611080d6adffd9b54",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "checkerboard_grid-mean_flow_steps_1.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_checkerboard_grid_mean_flow_steps_1.jpg",
+    "source_sha256": "df9508e8edf506ed2a3a733e5df997c6fa6d013e03cf09013f3fb2b5567ab684",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "checkerboard_grid-mean_flow_steps_20.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_checkerboard_grid_mean_flow_steps_20.jpg",
+    "source_sha256": "b41cb59fecebc9447f90445a5c9c339156b15dea140e729fcf8d0ad1c1b34f80",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "checkerboard_grid-drift.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_checkerboard_grid_drift.jpg",
+    "source_sha256": "9f315f2793b4f8f8adfc7ce9baf58f3435f6ba931f5d392bee64ddedda16d473",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_f-drift_flow_matching_steps_1.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_f_drift_flow_matching_steps_1.jpg",
+    "source_sha256": "e1e75ed6a611a860d33c864562ebb00c3df6d9e56a9896cdc9b5a4202f063e72",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_f-drift_flow_matching_steps_20.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_f_drift_flow_matching_steps_20.jpg",
+    "source_sha256": "799b8c6beb9804e5076413a32a7ad45d21dc3c65f1f7b254b53174c340ec08b2",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_f-flow_matching.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_f_flow_matching.jpg",
+    "source_sha256": "58d55db6bee1225112367d94c58ae5dc7224e8ab1ece4c2c78726592efd0d6f3",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_f-mean_flow_steps_1.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_f_mean_flow_steps_1.jpg",
+    "source_sha256": "1ffd7ae84f93f3708df1aa508f0df556ca149db6759a64213203f5329e38e7d6",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_f-mean_flow_steps_20.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_f_mean_flow_steps_20.jpg",
+    "source_sha256": "fa989696ccef1f9bb7498759bdc530c4c575176a2ea16db6ade29e0ff2285420",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_f-drift.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_f_drift.jpg",
+    "source_sha256": "9da28fa81451a5b2e476a82ab6aaa06c754fee3e4277de7030ce9ff61a0afb68",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_m-drift_flow_matching_steps_1.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_m_drift_flow_matching_steps_1.jpg",
+    "source_sha256": "3d860b4abcba0ba52b428298b27aa94fa95dbd2784be1f721dee47081e27d17c",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_m-drift_flow_matching_steps_20.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_m_drift_flow_matching_steps_20.jpg",
+    "source_sha256": "af9d3f72d8e9a7eebd7abd4b02ea5dc0ac3ee4c14a6c03cb9576fbc54c19c896",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_m-flow_matching.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_m_flow_matching.jpg",
+    "source_sha256": "86795efb4be30bf1d1ebbddf94322461309073e57c6536d2ed128f03d747b818",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_m-mean_flow_steps_1.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_m_mean_flow_steps_1.jpg",
+    "source_sha256": "7947b1b122cacbd8a770341f4b54a2a3d5d31f57617e4adbe1b67e850a0a910a",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_m-mean_flow_steps_20.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_m_mean_flow_steps_20.jpg",
+    "source_sha256": "4174df9fd6cad1e34be8df13ad36b3be66b289dbe5b934b01ec21ef5d4fe50cb",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "letter_m-drift.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_m_drift.jpg",
+    "source_sha256": "b74ee83bf39041e97ed10c25b766a7b4780b67ca396f780429987c486ae80c33",
+    "kind": "archived paper visualization",
+    "checkpoint": "not recovered"
+  },
+  {
+    "asset": "ffhq-nfe-1.jpg",
+    "source": "img/optimized/result_FFHQ/ffhq_fake_steps_grid_step_1.pdf",
+    "source_sha256": "84ddb2d3650e0fea15119780704ca11e7085eab3f09fe2be57653bfff5bd9c50",
+    "asset_sha256": "36253f3d00431701cf442797c80cf0a441997112df90aa171f101077f1e38c4f",
+    "kind": "archived paper visualization",
+    "export": "pdftoppm single page, JPEG quality 88, scale-to 1800",
+    "checkpoint": "not recovered",
+    "paired_seed": "unverified"
+  },
+  {
+    "asset": "ffhq-nfe-2.jpg",
+    "source": "img/optimized/result_FFHQ/ffhq_fake_steps_grid_step_2.pdf",
+    "source_sha256": "b486b01cffd0547149ad1ebcdc5b1b29a911ca84aec5265384236df556d9b68d",
+    "asset_sha256": "d2d6c8631be8dfaef0612e76a61361989a2c95c5b1dd8a08b4b3ed3ded814c5b",
+    "kind": "archived paper visualization",
+    "export": "pdftoppm single page, JPEG quality 88, scale-to 1800",
+    "checkpoint": "not recovered",
+    "paired_seed": "unverified"
+  },
+  {
+    "asset": "ffhq-nfe-5.jpg",
+    "source": "img/optimized/result_FFHQ/ffhq_fake_steps_grid_step_5.pdf",
+    "source_sha256": "f83651196d94537f441c03cec405330af3180c46b60c962d496609055154b4f7",
+    "asset_sha256": "05e1f986e4637364c637045be30c72245d9212847f67a5fae7c55147b64fd76d",
+    "kind": "archived paper visualization",
+    "export": "pdftoppm single page, JPEG quality 88, scale-to 1800",
+    "checkpoint": "not recovered",
+    "paired_seed": "unverified"
+  },
+  {
+    "asset": "ffhq-nfe-10.jpg",
+    "source": "img/optimized/result_FFHQ/ffhq_fake_steps_grid_step_10.pdf",
+    "source_sha256": "b2ff0cd291eb302955f9a2456e0520cf421dd4da5d269c4a53534f151e15c7d7",
+    "asset_sha256": "8a20114073c4a68937065e110ee60814485a4b58a3eeec471432b5b1809b8092",
+    "kind": "archived paper visualization",
+    "export": "pdftoppm single page, JPEG quality 88, scale-to 1800",
+    "checkpoint": "not recovered",
+    "paired_seed": "unverified"
+  }
+]

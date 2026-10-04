@@ -1,0 +1,27 @@
+# Reconstructed class-conditional DFM configuration.
+# Exact historical checkpoint and result provenance is not available in this release.
+runtime:
+  data_root: ../../data
+  runs_root: ../../runs
+
+evaluation:
+  evaluator: ffhq
+  num_sampling_steps: [20]
+  metrics: [latent_ot, fid]
+  params:
+    real_split: test
+    real_npz: "{data_root}/ffhq_latents_6class/test_latents_by_class.npz"
+    device: cuda
+    n_per_class: 128
+    solver: emd
+    metric: l2_sq
+    sinkhorn_reg: 0.05
+    ot_iters: 200000
+    alae_ckpt: "{runs_root}/ffhq_alae/latest/alae_ffhq.pt"
+    decode_batch: 8
+    gen_batch: 256
+    fid_batch: 64
+    fid_num_workers: 0
+    fid_decode_noise: true
+    save_size: 1024
+    reuse_images: false

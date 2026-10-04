@@ -1,0 +1,70 @@
+# Reconstructed class-conditional DFM configuration.
+# Exact historical checkpoint and result provenance is not available in this release.
+runtime:
+  data_root: ../../data
+  runs_root: ../../runs
+
+dataset:
+  name: mnist_latent
+  params:
+    root_dir: "{runs_root}/mnist_ae/latest"
+    split: train
+
+architecture:
+  name: mnist_latent_mlp
+  params:
+    hidden_sizes: [256, 256, 256]
+    class_embedding_dim: 32
+
+method:
+  name: drift_flow_matching
+  params:
+    groups_per_class: 4
+    drift_form: split_v0
+    use_ema: true
+    ema_decay: 0.999
+    P_mean_t: -1.0
+    P_std_t: 2.5
+    P_mean_r: 1.0
+    P_std_r: 2.5
+    norm_eps: 0.0001
+    norm_p: 0.0
+    kernel_temp_pos: 1
+    kernel_temp_neg: 1
+    sinkhorn_iters: 20
+
+trainer:
+  epochs: 200
+  batch_size: 16000
+  steps_per_epoch: 100
+  learning_rate: 0.0002
+  weight_decay: 0.0
+  grad_clip: 1.0
+  device: cuda
+  seed: 42
+  log_every: 10
+  checkpoint_every: 25
+
+evaluation:
+  evaluator: mnist
+  num_sampling_steps: [1, 2, 5, 10, 20, 50]
+  sample_every: 25
+  sample_count_per_class: 8
+  metrics_every: 25
+  run_final: true
+  metrics: [latent_ot, image_ot, accuracy]
+  params:
+    ae_ckpt: "{runs_root}/mnist_ae/latest/ae_final.pt"
+    latent_root: "{runs_root}/mnist_ae/latest"
+    classifier_ckpt: "{runs_root}/mnist_clf/mnist_clf.pt"
+    device: cuda
+    n_per_class: 100
+    solver: emd
+    metric: l2_sq
+    sinkhorn_reg: 0.05
+    ot_iters: 200000
+    gen_batch: 256
+
+output:
+  root_dir: "{runs_root}/mnist_drift"
+  run_name: mnist_dfm

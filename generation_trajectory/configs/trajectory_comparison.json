@@ -1,0 +1,17 @@
+{
+  "methods": ["drift_flow_matching", "flow_matching", "mean_flow"],
+  "datasets": [
+    "2d_circular_uniform_to_checkerboard_grid",
+    "2d_circular_uniform_to_letter_f",
+    "2d_circular_uniform_to_letter_m",
+    "2d_circular_uniform_to_moon"
+  ],
+  "epochs": 400,
+  "steps_per_epoch": 100,
+  "batch_size": 512,
+  "eval_samples": 1024,
+  "max_display": 512,
+  "nfe": [1, 20],
+  "fm_nfe": 50,
+  "output": "outputs/comparison"
+}

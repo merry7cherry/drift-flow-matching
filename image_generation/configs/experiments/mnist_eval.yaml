@@ -1,0 +1,21 @@
+# Reconstructed class-conditional DFM configuration.
+# Exact historical checkpoint and result provenance is not available in this release.
+runtime:
+  data_root: ../../data
+  runs_root: ../../runs
+
+evaluation:
+  evaluator: mnist
+  num_sampling_steps: [20]
+  metrics: [latent_ot, image_ot, accuracy]
+  params:
+    ae_ckpt: "{runs_root}/mnist_ae/latest/ae_final.pt"
+    latent_root: "{runs_root}/mnist_ae/latest"
+    classifier_ckpt: "{runs_root}/mnist_clf/mnist_clf.pt"
+    device: cuda
+    n_per_class: 100
+    solver: emd
+    metric: l2_sq
+    sinkhorn_reg: 0.05
+    ot_iters: 200000
+    gen_batch: 256

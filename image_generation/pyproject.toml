@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "driftfm"
+version = "0.1.0"
+description = "Modular Drift Flow Matching framework for latent generative modeling."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "Pillow",
+    "PyYAML",
+    "torch",
+    "torchvision",
+]
+
+[project.optional-dependencies]
+data = ["huggingface_hub"]
+eval = [
+    "matplotlib",
+    "scipy",
+    "scikit-learn",
+    "POT",
+    "pytorch-fid",
+    "umap-learn",
+]
+dev = [
+    "pytest",
+]
+
+[project.scripts]
+driftfm-sample = "driftfm.tasks.sample:main"
+driftfm-smoke = "driftfm.tasks.smoke:main"
+driftfm-train = "driftfm.tasks.train:main"
+driftfm-mnist-train-ae = "driftfm.tasks.mnist_ae:main"
+driftfm-mnist-encode-latents = "driftfm.tasks.mnist_encode:main"
+driftfm-ffhq-download-aging = "driftfm.tasks.ffhq_download_aging:main"
+driftfm-ffhq-build-split = "driftfm.tasks.ffhq_split:main"
+driftfm-ffhq-import-alae = "driftfm.tasks.ffhq_import_alae:main"
+driftfm-ffhq-encode-latents = "driftfm.tasks.ffhq_encode:main"
+driftfm-evaluate = "driftfm.tasks.evaluate:main"
+driftfm-eval-mnist = "driftfm.tasks.evaluate_mnist:main"
+driftfm-eval-ffhq = "driftfm.tasks.evaluate_ffhq:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

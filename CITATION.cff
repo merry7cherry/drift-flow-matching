@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite Drift Flow Matching."
+title: "Drift Flow Matching"
+type: software
+authors:
+  - family-names: Ma
+    given-names: Chenrui
+  - family-names: Xiao
+    given-names: Xi
+  - family-names: Zhao
+    given-names: Lin
+  - family-names: Wang
+    given-names: Tianyang
+  - family-names: Fioretto
+    given-names: Ferdinando
+  - family-names: Shen
+    given-names: Yanning
+repository-code: "https://github.com/merry7cherry/drift-flow-matching"
+url: "https://merry7cherry.github.io/drift-flow-matching/"
+preferred-citation:
+  type: article
+  title: "Drift Flow Matching"
+  authors:
+    - family-names: Ma
+      given-names: Chenrui
+    - family-names: Xiao
+      given-names: Xi
+    - family-names: Zhao
+      given-names: Lin
+    - family-names: Wang
+      given-names: Tianyang
+    - family-names: Fioretto
+      given-names: Ferdinando
+    - family-names: Shen
+      given-names: Yanning
+  journal: arXiv
+  year: 2026
+  doi: "10.48550/arXiv.2605.17244"

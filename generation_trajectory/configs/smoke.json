@@ -1,0 +1,11 @@
+{
+  "methods": ["drift_flow_matching"],
+  "datasets": ["2d_circular_uniform_to_moon"],
+  "epochs": 1,
+  "steps_per_epoch": 2,
+  "batch_size": 16,
+  "eval_samples": 16,
+  "max_display": 16,
+  "nfe": [1, 2],
+  "output": "outputs/smoke"
+}
