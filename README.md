@@ -21,6 +21,8 @@ Each module is independently installable with Python 3.11. Install only the modu
 
 This initial release covers **MNIST, FFHQ, and 2D synthetic trajectories**. It does not include the paper's ImageNet or robotic-control implementations.
 
+**This is a source-and-training release; pretrained DFM checkpoints are not distributed.** Follow the [MNIST](image_generation/docs/datasets/mnist.md), [FFHQ](image_generation/docs/datasets/ffhq.md), or [trajectory](generation_trajectory/README.md) workflow to train your own models, then use the provided checkpoint sampling and evaluation commands.
+
 The source has been streamlined to the paper's grouped, class-conditioned DFM objective. Later guidance and self-consistency experiments are not part of this release. Public configurations are reconstructed from available source and manuscript settings. **Original paper checkpoints and exact historical run configurations are not included.** The project page's archived figures and reported metrics are not newly reproduced results from this release. See [verification and limitations](reproduction/README.md) before making numerical comparisons.
 
 ## Repository map
@@ -45,6 +47,8 @@ LICENSES/                retained third-party licenses
 }
 ```
 
-## Acknowledgements
+## License and acknowledgements
+
+Original DFM code and documentation are released under the [MIT License](LICENSE). ALAE-derived portions retain their Apache 2.0 license and notices.
 
 The FFHQ autoencoder integration adapts parts of [ALAE](https://github.com/podgorskiy/ALAE), by Stanislav Pidhorskyi and collaborators. Please retain its Apache 2.0 notices. Dataset and pretrained-weight terms remain those of their original providers. See [third-party notices](THIRD_PARTY_NOTICES.md).

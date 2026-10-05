@@ -6,6 +6,8 @@ This release provides runnable training, sampling, evaluation, and visualization
 2. **Release workflow verification.** Small tests of installation, training, checkpoint reload, sampling, and evaluation. These do not establish the paper's numerical results.
 3. **Full reproduction.** Re-running the matched dataset representation, preprocessing, model, seed, budget, checkpoint selection, and evaluation protocol. Original paper checkpoints and historical run manifests have not been recovered, so exact numerical reproduction is not claimed.
 
+The first release intentionally distributes source and training instructions without pretrained DFM checkpoints. Checkpoint save/load support is provided for models you train yourself. Third-party autoencoder requirements, including FFHQ's frozen ALAE model, are documented separately.
+
 ## Scientific configuration
 
 The image module uses the paper's fixed-class grouped drift construction: a Sinkhorn-weighted positive transport term toward samples of the same class, minus the generated-sample term. The source-development variants with omega conditioning and cross-class mixing are omitted.
