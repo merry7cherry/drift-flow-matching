@@ -206,5 +206,149 @@
     "export": "pdftoppm single page, JPEG quality 88, scale-to 1800",
     "checkpoint": "not recovered",
     "paired_seed": "unverified"
+  },
+  {
+    "asset": "moon-ground_truth.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_moon_ground_truth.jpg",
+    "source_sha256": "7a62e8b0b4141dbdbaf1aa932cf0a6214eff8cadc19b9dbf12dab0a8ae9a3c5e",
+    "asset_sha256": "7a62e8b0b4141dbdbaf1aa932cf0a6214eff8cadc19b9dbf12dab0a8ae9a3c5e",
+    "export": "unchanged byte-for-byte copy",
+    "kind": "archived paper ground-truth visualization",
+    "source_figure": "img/img_viz.tex",
+    "source_figure_label": "fig:viz_2d_synthetic",
+    "dataset": "moon",
+    "semantics": "Blue source circular distribution and red target distribution; not generated samples.",
+    "checkpoint": "not applicable"
+  },
+  {
+    "asset": "checkerboard_grid-ground_truth.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_checkerboard_grid_ground_truth.jpg",
+    "source_sha256": "8f35d26aa15702b7b8604ffd8bdee3e1c0ac20a4b7e76713277abf9ec18c8180",
+    "asset_sha256": "8f35d26aa15702b7b8604ffd8bdee3e1c0ac20a4b7e76713277abf9ec18c8180",
+    "export": "unchanged byte-for-byte copy",
+    "kind": "archived paper ground-truth visualization",
+    "source_figure": "img/img_viz.tex",
+    "source_figure_label": "fig:viz_2d_synthetic",
+    "dataset": "checkerboard_grid",
+    "semantics": "Blue source circular distribution and red target distribution; not generated samples.",
+    "checkpoint": "not applicable"
+  },
+  {
+    "asset": "letter_f-ground_truth.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_f_ground_truth.jpg",
+    "source_sha256": "541a4332e6010ced63dee572a22b661afe2542743c16b8e16f37a28606b141c7",
+    "asset_sha256": "541a4332e6010ced63dee572a22b661afe2542743c16b8e16f37a28606b141c7",
+    "export": "unchanged byte-for-byte copy",
+    "kind": "archived paper ground-truth visualization",
+    "source_figure": "img/img_viz.tex",
+    "source_figure_label": "fig:viz_2d_synthetic",
+    "dataset": "letter_f",
+    "semantics": "Blue source circular distribution and red target distribution; not generated samples.",
+    "checkpoint": "not applicable"
+  },
+  {
+    "asset": "letter_m-ground_truth.jpg",
+    "source": "img/optimized/img_viz/2d_circular_uniform_to_letter_m_ground_truth.jpg",
+    "source_sha256": "656e3011d1cdbaaf0611e6d913d3b5c7c9f30c0eb75ec4c43e84e01f48a8a15f",
+    "asset_sha256": "656e3011d1cdbaaf0611e6d913d3b5c7c9f30c0eb75ec4c43e84e01f48a8a15f",
+    "export": "unchanged byte-for-byte copy",
+    "kind": "archived paper ground-truth visualization",
+    "source_figure": "img/img_viz.tex",
+    "source_figure_label": "fig:viz_2d_synthetic",
+    "dataset": "letter_m",
+    "semantics": "Blue source circular distribution and red target distribution; not generated samples.",
+    "checkpoint": "not applicable"
+  },
+  {
+    "asset": "group-source-target.jpg",
+    "source": "img/optimized/img_group_drift/01_source_target.jpg",
+    "source_sha256": "3f7027c13aa7459cba841cfdfdf63382956f8a91b91997ec578a8e2e1b2ce6ef",
+    "asset_sha256": "3f7027c13aa7459cba841cfdfdf63382956f8a91b91997ec578a8e2e1b2ce6ef",
+    "export": "unchanged byte-for-byte copy",
+    "kind": "archived paper grouped-drift illustration",
+    "source_figure": "img/img_group_drift.tex",
+    "source_figure_label": "fig:dfm_group_drift",
+    "panel": "source-target",
+    "label": "Endpoint distributions: blue source p_0 and red target p_1.",
+    "time_pair": null,
+    "semantics": "Blue is the source distribution; red is the target distribution.",
+    "checkpoint": "not recovered",
+    "interpretation": "Separate time-pair groups, not successive frames of a sampling trajectory."
+  },
+  {
+    "asset": "group-early.jpg",
+    "source": "img/optimized/img_group_drift/group_early_drift.jpg",
+    "source_sha256": "4778884b63a4e0a9bcad9142adeb66a7cfa4aaf058c926164b2766d37ff17a69",
+    "asset_sha256": "4778884b63a4e0a9bcad9142adeb66a7cfa4aaf058c926164b2766d37ff17a69",
+    "export": "unchanged byte-for-byte copy",
+    "kind": "archived paper grouped-drift illustration",
+    "source_figure": "img/img_group_drift.tex",
+    "source_figure_label": "fig:dfm_group_drift",
+    "panel": "early",
+    "label": "Group 1",
+    "time_pair": [
+      0.05,
+      0.3
+    ],
+    "semantics": "Red is the target-time marginal; green is model output under the same model parameters; dark arrows are the grouped drift field.",
+    "checkpoint": "not recovered",
+    "interpretation": "Separate time-pair groups, not successive frames of a sampling trajectory."
+  },
+  {
+    "asset": "group-wide.jpg",
+    "source": "img/optimized/img_group_drift/group_wide_drift.jpg",
+    "source_sha256": "0f2c4c6a3f16c660058dfb284c437f0085dbe09921a4e2c511807fb6a493be27",
+    "asset_sha256": "0f2c4c6a3f16c660058dfb284c437f0085dbe09921a4e2c511807fb6a493be27",
+    "export": "unchanged byte-for-byte copy",
+    "kind": "archived paper grouped-drift illustration",
+    "source_figure": "img/img_group_drift.tex",
+    "source_figure_label": "fig:dfm_group_drift",
+    "panel": "wide",
+    "label": "Group 2",
+    "time_pair": [
+      0.2,
+      0.8
+    ],
+    "semantics": "Red is the target-time marginal; green is model output under the same model parameters; dark arrows are the grouped drift field.",
+    "checkpoint": "not recovered",
+    "interpretation": "Separate time-pair groups, not successive frames of a sampling trajectory."
+  },
+  {
+    "asset": "group-middle.jpg",
+    "source": "img/optimized/img_group_drift/group_middle_drift.jpg",
+    "source_sha256": "7ba3d95ac8b670bdf15127f4441313b88b8c19669e2d00966223b6f5b9219e3c",
+    "asset_sha256": "7ba3d95ac8b670bdf15127f4441313b88b8c19669e2d00966223b6f5b9219e3c",
+    "export": "unchanged byte-for-byte copy",
+    "kind": "archived paper grouped-drift illustration",
+    "source_figure": "img/img_group_drift.tex",
+    "source_figure_label": "fig:dfm_group_drift",
+    "panel": "middle",
+    "label": "Group 3",
+    "time_pair": [
+      0.35,
+      0.65
+    ],
+    "semantics": "Red is the target-time marginal; green is model output under the same model parameters; dark arrows are the grouped drift field.",
+    "checkpoint": "not recovered",
+    "interpretation": "Separate time-pair groups, not successive frames of a sampling trajectory."
+  },
+  {
+    "asset": "group-late.jpg",
+    "source": "img/optimized/img_group_drift/group_late_drift.jpg",
+    "source_sha256": "7b0ceee2dcf859e7eac52b0300b9296ef7c09f2b9713ef5911b19d65400ba5e1",
+    "asset_sha256": "7b0ceee2dcf859e7eac52b0300b9296ef7c09f2b9713ef5911b19d65400ba5e1",
+    "export": "unchanged byte-for-byte copy",
+    "kind": "archived paper grouped-drift illustration",
+    "source_figure": "img/img_group_drift.tex",
+    "source_figure_label": "fig:dfm_group_drift",
+    "panel": "late",
+    "label": "Group 4",
+    "time_pair": [
+      0.7,
+      0.95
+    ],
+    "semantics": "Red is the target-time marginal; green is model output under the same model parameters; dark arrows are the grouped drift field.",
+    "checkpoint": "not recovered",
+    "interpretation": "Separate time-pair groups, not successive frames of a sampling trajectory."
   }
 ]

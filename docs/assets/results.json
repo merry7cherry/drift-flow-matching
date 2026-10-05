@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "measurement_origin": "Values reported in the active manuscript tables; not re-evaluated for the project page.",
+  "sources": {
+    "generation_table": {
+      "path": "tab/tab_combine.tex",
+      "sha256": "65a70b3bfccd4eda82e26664761acaf00fcb081f97cc3726c2b9db4ca0e15ba8"
+    },
+    "robotics_table": {
+      "path": "tab/tab_robotic.tex",
+      "sha256": "1bc554ea0a4e68ce8f335485c3ba4260770adf5744bdf7009398ee13e1f08612"
+    },
+    "experiment_protocol": {
+      "path": "sec/05_experiment.tex",
+      "sha256": "d979b5fd333d561c9ebf0969fa03947aacf0b946980597cf0bd7a30923170bd7"
+    }
+  },
+  "mnist_ffhq": {
+    "source": "tab/tab_combine.tex",
+    "table_label": "tab:mnist_ffhq_comparison",
+    "scope": "Complete eight-row MNIST and FFHQ comparison from the active manuscript table.",
+    "release_scope": "MNIST and FFHQ implementation included; original image checkpoints and complete historical run provenance are not included.",
+    "protocol": {
+      "mnist": "Class-conditional generation in a learned 16-dimensional autoencoder latent space. EMD is average per-class squared 2-Wasserstein distance between test and generated latents. Accuracy uses a classifier trained on the MNIST training split.",
+      "ffhq": "Six-class generation in frozen 512-dimensional ALAE latent space. Latent EMD and FID are reported; FID compares generated and real latents decoded by the same frozen ALAE decoder at 1024 x 1024, not raw-image-reference FID."
+    },
+    "metrics": {
+      "mnist_emd": {
+        "label": "MNIST latent EMD",
+        "direction": "lower"
+      },
+      "mnist_accuracy_percent": {
+        "label": "MNIST accuracy",
+        "unit": "percent",
+        "direction": "higher"
+      },
+      "ffhq_emd": {
+        "label": "FFHQ latent EMD",
+        "direction": "lower"
+      },
+      "ffhq_fid": {
+        "label": "FFHQ decoded-reference FID",
+        "direction": "lower"
+      }
+    },
+    "rows": [
+      {
+        "method": "Flow Matching",
+        "nfe": 50,
+        "mnist_emd": 37.2,
+        "mnist_accuracy_percent": 100.0,
+        "ffhq_emd": 198.4,
+        "ffhq_fid": 77.4
+      },
+      {
+        "method": "Mean Flow",
+        "nfe": 1,
+        "mnist_emd": 68.6,
+        "mnist_accuracy_percent": 96.7,
+        "ffhq_emd": 258.7,
+        "ffhq_fid": 131.2
+      },
+      {
+        "method": "Mean Flow",
+        "nfe": 2,
+        "mnist_emd": 48.1,
+        "mnist_accuracy_percent": 99.1,
+        "ffhq_emd": 211.7,
+        "ffhq_fid": 85.4
+      },
+      {
+        "method": "Mean Flow",
+        "nfe": 5,
+        "mnist_emd": 37.5,
+        "mnist_accuracy_percent": 100.0,
+        "ffhq_emd": 204.2,
+        "ffhq_fid": 82.1
+      },
+      {
+        "method": "Drift Model",
+        "nfe": 1,
+        "mnist_emd": 37.3,
+        "mnist_accuracy_percent": 100.0,
+        "ffhq_emd": 225.5,
+        "ffhq_fid": 116.2
+      },
+      {
+        "method": "DFM",
+        "nfe": 1,
+        "mnist_emd": 37.3,
+        "mnist_accuracy_percent": 100.0,
+        "ffhq_emd": 225.5,
+        "ffhq_fid": 116.2
+      },
+      {
+        "method": "DFM",
+        "nfe": 2,
+        "mnist_emd": 37.2,
+        "mnist_accuracy_percent": 100.0,
+        "ffhq_emd": 215.7,
+        "ffhq_fid": 80.4
+      },
+      {
+        "method": "DFM",
+        "nfe": 5,
+        "mnist_emd": 37.2,
+        "mnist_accuracy_percent": 100.0,
+        "ffhq_emd": 196.2,
+        "ffhq_fid": 75.9
+      }
+    ]
+  },
+  "imagenet": {
+    "source": "tab/tab_combine.tex",
+    "table_label": "tab:image256",
+    "scope": "DFM rows only from the active ImageNet 256 x 256 comparison.",
+    "release_scope": "Paper result; ImageNet implementation and checkpoints are outside this code release.",
+    "protocol": "ImageNet-1k 256 x 256 synthesis using a pretrained VAE tokenizer with 32 x 32 x 4 latents and a latent-MAE feature-space DFM objective. FID and IS are evaluated on 50,000 randomly generated images, following the Drift Model protocol.",
+    "model": "DFM, L/2",
+    "parameters_millions": 463,
+    "metrics": {
+      "fid": {
+        "label": "FID",
+        "direction": "lower"
+      },
+      "inception_score": {
+        "label": "IS",
+        "direction": "higher"
+      }
+    },
+    "rows": [
+      {
+        "nfe": 1,
+        "fid": 1.52,
+        "inception_score": 259.4
+      },
+      {
+        "nfe": 2,
+        "fid": 1.45,
+        "inception_score": 268.3
+      },
+      {
+        "nfe": 5,
+        "fid": 1.34,
+        "inception_score": 279.8
+      },
+      {
+        "nfe": 10,
+        "fid": 1.31,
+        "inception_score": 287.4
+      }
+    ]
+  },
+  "robotics": {
+    "source": "tab/tab_robotic.tex",
+    "table_label": "tab:robotics_control",
+    "scope": "Two representative DFM Policy task-setting rows; not the complete robotics table.",
+    "release_scope": "Paper result; robotics implementation and checkpoints are outside this code release.",
+    "protocol": "The core policy is replaced with DFM under the Diffusion Policy and Drift Policy experimental setting. DFM loss uses raw control representations. Reported success rates average the last 10 checkpoints.",
+    "method": "Drift Flow Matching Policy",
+    "metric": {
+      "label": "Success rate",
+      "unit": "fraction",
+      "direction": "higher"
+    },
+    "nfe": [
+      1,
+      2,
+      5,
+      10
+    ],
+    "series": [
+      {
+        "task": "ToolHang",
+        "setting": "State",
+        "success_rate": [
+          0.41,
+          0.77,
+          0.81,
+          0.86
+        ]
+      },
+      {
+        "task": "PushT",
+        "setting": "Visual",
+        "success_rate": [
+          0.86,
+          0.87,
+          0.89,
+          0.9
+        ]
+      }
+    ]
+  }
+}

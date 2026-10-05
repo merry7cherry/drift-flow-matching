@@ -17,7 +17,11 @@ The original class-only image implementation (`split_v0`) and the released imple
 
 ## Project page
 
-All 28 archived figure assets were checked against their provenance hashes. Local asset links and page anchors passed automated checks. Desktop and 390-pixel mobile layouts, NFE switching, distribution/method selectors, and BibTeX copying were checked in a browser. The controls display archived paper figures; they do not perform model inference.
+The paper-aligned page revision was checked on 2026-10-05 UTC (2026-10-04 America/New_York). All **37 archived figure assets** match their provenance hashes: 28 trajectory/reference panels, five grouped-drift panels, and four FFHQ grids. Local page references, anchors, JavaScript syntax, time-pair labels, and all entries in `docs/assets/results.json` passed verification. The results data was compared with the active manuscript tables; all displayed tables received an independent scientific review.
+
+Browser checks covered the default DFM 1/20-NFE comparison, independent DFM NFE selection, method-specific NFE options, all three comparison presets, all four target distributions, four training time pairs, FFHQ image/metric switching (including the explicit missing 10-NFE metrics), and BibTeX copying. Desktop and 390-pixel mobile layouts were inspected; neither had page-level horizontal overflow and no JavaScript errors were observed. Tables scroll within their own regions on small screens.
+
+The controls display archived paper figures, not live model inference. NFE counts function evaluations rather than wall-clock cost. ImageNet and robotics are shown as paper evidence and remain outside the initial implementation release. The page does not certify historical paired seeds or checkpoint identity.
 
 ## Not verified by these checks
 
