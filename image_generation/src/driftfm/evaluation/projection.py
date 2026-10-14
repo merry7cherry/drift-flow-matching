@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 
 PLOT_STAGE_ORDER = ("fake", "real")
-PROJECTION_METHODS = ("pca", "tsne", "umap", "lda")
+PROJECTION_METHODS = ("pca", "umap")
 _CLASS_PALETTE = (
     "#4E79A7",
     "#F28E2B",
@@ -563,12 +563,6 @@ def _project_by_stage(
     }
 
 
-def _safe_tsne_perplexity(n_samples: int) -> float:
-    if n_samples < 2:
-        raise ValueError("t-SNE projection requires at least 2 latent points")
-    return float(min(30.0, max(1.0, (n_samples - 1) / 3.0)))
-
-
 def _safe_umap_neighbors(n_samples: int) -> int:
     if n_samples < 3:
         raise ValueError("UMAP projection requires at least 3 latent points")
@@ -593,34 +587,6 @@ def _project_with_pca(
         _project_by_stage(model, fake_by_class=by_stage["fake"], real_by_class=by_stage["real"], class_names=class_names),
         {"n_components": 2},
         model.explained_variance_ratio_,
-    )
-
-
-def _project_with_tsne(
-    by_stage: dict[str, dict[str, np.ndarray]],
-    *,
-    class_names: list[str],
-    random_state: int,
-) -> tuple[dict[str, dict[str, np.ndarray]], dict[str, Any], np.ndarray | None]:
-    try:
-        from sklearn.manifold import TSNE
-    except ImportError as exc:
-        raise ImportError("scikit-learn is required for t-SNE evaluation artifacts.") from exc
-
-    fitted_points, _ = _stack_stage_points(by_stage, stage_names=PLOT_STAGE_ORDER, class_names=class_names)
-    perplexity = _safe_tsne_perplexity(int(fitted_points.shape[0]))
-    model = TSNE(
-        n_components=2,
-        perplexity=perplexity,
-        init="random",
-        max_iter=250,
-        random_state=int(random_state),
-    )
-    projected = model.fit_transform(fitted_points)
-    return (
-        _split_projected_points(projected, by_stage, stage_names=PLOT_STAGE_ORDER, class_names=class_names),
-        {"n_components": 2, "perplexity": perplexity, "random_state": int(random_state)},
-        None,
     )
 
 
@@ -656,34 +622,6 @@ def _project_with_umap(
     )
 
 
-def _project_with_lda(
-    by_stage: dict[str, dict[str, np.ndarray]],
-    *,
-    class_names: list[str],
-    family_spec: ProjectionArtifactFamilySpec,
-) -> tuple[dict[str, dict[str, np.ndarray]], dict[str, Any], np.ndarray | None]:
-    try:
-        from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-    except ImportError as exc:
-        raise ImportError("scikit-learn is required for LDA evaluation artifacts.") from exc
-
-    fitted_points, class_labels = _stack_stage_points(
-        by_stage,
-        stage_names=family_spec.fit_stage_names,
-        class_names=class_names,
-    )
-    n_components = min(2, len(class_names) - 1, int(fitted_points.shape[1]))
-    if n_components < 1:
-        raise ValueError("LDA projection requires at least 2 classes and 1 latent feature")
-    model = LinearDiscriminantAnalysis(n_components=n_components)
-    model.fit(fitted_points, class_labels)
-    return (
-        _project_by_stage(model, fake_by_class=by_stage["fake"], real_by_class=by_stage["real"], class_names=class_names),
-        {"n_components": int(n_components), "label_source": "class"},
-        None,
-    )
-
-
 def _compute_projection(
     by_stage: dict[str, dict[str, np.ndarray]],
     *,
@@ -693,8 +631,6 @@ def _compute_projection(
 ) -> tuple[dict[str, dict[str, np.ndarray]], dict[str, Any], np.ndarray | None]:
     if family_spec.method_name == "pca":
         return _project_with_pca(by_stage, class_names=class_names, family_spec=family_spec)
-    if family_spec.method_name == "tsne":
-        return _project_with_tsne(by_stage, class_names=class_names, random_state=random_state)
     if family_spec.method_name == "umap":
         return _project_with_umap(
             by_stage,
@@ -702,8 +638,6 @@ def _compute_projection(
             family_spec=family_spec,
             random_state=random_state,
         )
-    if family_spec.method_name == "lda":
-        return _project_with_lda(by_stage, class_names=class_names, family_spec=family_spec)
     raise ValueError(f"Unsupported latent projection method: {family_spec.method_name}")
 
 
@@ -818,14 +752,6 @@ def write_method_artifacts(
         family_spec=_family_spec(method_name, fit_basis=_FAKE_REAL_FIT_BASIS),
         random_state=random_state,
     )
-    if method_name == "tsne":
-        return ProjectionArtifacts(
-            plot_path=fake_real_family.plot_path,
-            real_only_plot_path=fake_real_family.real_only_plot_path,
-            generated_only_plot_path=fake_real_family.generated_only_plot_path,
-            projection_path=fake_real_family.projection_path,
-        )
-
     real_fit_family = _write_artifact_family(
         output_root=output_root,
         by_stage=by_stage,
@@ -885,24 +811,6 @@ def write_pca_artifacts(
     )
 
 
-def write_tsne_artifacts(
-    *,
-    fake_by_class: dict[str, np.ndarray],
-    real_by_class: dict[str, np.ndarray],
-    class_names: list[str],
-    output_dir: str | Path,
-    random_state: int,
-) -> ProjectionArtifacts:
-    return write_method_artifacts(
-        method_name="tsne",
-        fake_by_class=fake_by_class,
-        real_by_class=real_by_class,
-        class_names=class_names,
-        output_dir=output_dir,
-        random_state=random_state,
-    )
-
-
 def write_umap_artifacts(
     *,
     fake_by_class: dict[str, np.ndarray],
@@ -918,23 +826,4 @@ def write_umap_artifacts(
         class_names=class_names,
         output_dir=output_dir,
         random_state=random_state,
-    )
-
-
-def write_lda_artifacts(
-    *,
-    fake_by_class: dict[str, np.ndarray],
-    real_by_class: dict[str, np.ndarray],
-    class_names: list[str],
-    output_dir: str | Path,
-    random_state: int = 42,
-) -> ProjectionArtifacts:
-    del random_state
-    return write_method_artifacts(
-        method_name="lda",
-        fake_by_class=fake_by_class,
-        real_by_class=real_by_class,
-        class_names=class_names,
-        output_dir=output_dir,
-        random_state=42,
     )

@@ -23,7 +23,6 @@ from ..config import (
 from ..data import Conditioning, TransportDataset, create_dataset
 from ..evaluation.registry import evaluate_checkpoint
 from ..methods import create_method
-from ..methods.drift_flow_matching import conditioning_mode_for_drift_form
 from ..utils import (
     build_seed_hash_run_name,
     collect_determinism_metadata,
@@ -91,10 +90,6 @@ def _materialize_architecture_section(
     params.setdefault("data_dim", dataset.data_dim)
     if dataset.num_classes is not None:
         params.setdefault("num_classes", dataset.num_classes)
-    params.setdefault(
-        "conditioning_mode",
-        conditioning_mode_for_drift_form(str(config.method.params.get("drift_form", "split_v0"))),
-    )
     return ArchitectureSection(name=config.architecture.name, params=params)
 
 

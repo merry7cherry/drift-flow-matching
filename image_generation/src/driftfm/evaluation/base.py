@@ -17,6 +17,7 @@ class EvaluationResult:
 class CheckpointEvaluator(ABC):
     name: str
     supported_metrics: tuple[str, ...]
+    default_metrics: tuple[str, ...]
 
     def validate_metrics(self, metrics: list[str]) -> list[str]:
         unsupported = sorted(set(metrics).difference(self.supported_metrics))

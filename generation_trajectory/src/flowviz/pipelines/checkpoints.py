@@ -3,12 +3,12 @@ from __future__ import annotations
 from dataclasses import asdict
 from pathlib import Path
 import torch
-from ..models.mlp import DriftFlowVelocityMLP, MeanVelocityMLP, VelocityMLP
+from ..models.mlp import TwoTimeVelocityMLP, VelocityMLP
 
 
 MODEL_TYPES = {
-    "drift_flow_matching": DriftFlowVelocityMLP,
-    "mean_flow": MeanVelocityMLP,
+    "drift_flow_matching": TwoTimeVelocityMLP,
+    "mean_flow": TwoTimeVelocityMLP,
     "flow_matching": VelocityMLP,
 }
 

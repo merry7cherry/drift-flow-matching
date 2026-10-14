@@ -35,7 +35,23 @@ def _sample_noise_like_samples(
     return (noise * std).to(device=samples.device, dtype=samples.dtype)
 
 
-class CircularUniformToLetterFDataset(PairDataset):
+class CircularSourceDataset(PairDataset):
+    """Shared uniform-disk source for the paper's four target distributions."""
+
+    def __init__(self, source_radius: float, seed: int) -> None:
+        super().__init__(dim=2, seed=seed)
+        self.source_radius = source_radius
+
+    def sample_base(self, batch_size: int, device: torch.device) -> torch.Tensor:
+        radii = self.source_radius * torch.sqrt(
+            torch.rand(batch_size, generator=self._generator)
+        )
+        angles = 2.0 * math.pi * torch.rand(batch_size, generator=self._generator)
+        samples = torch.stack((radii * torch.cos(angles), radii * torch.sin(angles)), dim=1)
+        return samples.to(device)
+
+
+class CircularUniformToLetterFDataset(CircularSourceDataset):
     """2D dataset mapping a uniform circular source to a target letter F."""
 
     def __init__(
@@ -47,8 +63,7 @@ class CircularUniformToLetterFDataset(PairDataset):
         target_std: float = 0.15,
         seed: int = 42,
     ) -> None:
-        super().__init__(dim=2, seed=seed)
-        self.source_radius = source_radius
+        super().__init__(source_radius=source_radius, seed=seed)
         self.target_std = target_std
 
         half_width = letter_width / 2.0
@@ -63,14 +78,6 @@ class CircularUniformToLetterFDataset(PairDataset):
             dtype=torch.float32,
         )
 
-    def sample_base(self, batch_size: int, device: torch.device) -> torch.Tensor:
-        radii = self.source_radius * torch.sqrt(
-            torch.rand(batch_size, generator=self._generator)
-        )
-        angles = 2.0 * math.pi * torch.rand(batch_size, generator=self._generator)
-        samples = torch.stack((radii * torch.cos(angles), radii * torch.sin(angles)), dim=1)
-        return samples.to(device)
-
     def sample_target(self, batch_size: int, device: torch.device) -> torch.Tensor:
         samples = _sample_segments(self.target_segments, batch_size, self._generator, device)
         noise = _sample_noise_like_samples(
@@ -83,7 +90,7 @@ class CircularUniformToLetterFDataset(PairDataset):
         return (samples + noise).to(device)
 
 
-class CircularUniformToLetterMDataset(PairDataset):
+class CircularUniformToLetterMDataset(CircularSourceDataset):
     """2D dataset mapping a uniform circular source to a target letter M."""
 
     def __init__(
@@ -94,8 +101,7 @@ class CircularUniformToLetterMDataset(PairDataset):
         target_std: float = 0.15,
         seed: int = 42,
     ) -> None:
-        super().__init__(dim=2, seed=seed)
-        self.source_radius = source_radius
+        super().__init__(source_radius=source_radius, seed=seed)
         self.target_std = target_std
 
         half_width = letter_width / 2.0
@@ -110,14 +116,6 @@ class CircularUniformToLetterMDataset(PairDataset):
             dtype=torch.float32,
         )
 
-    def sample_base(self, batch_size: int, device: torch.device) -> torch.Tensor:
-        radii = self.source_radius * torch.sqrt(
-            torch.rand(batch_size, generator=self._generator)
-        )
-        angles = 2.0 * math.pi * torch.rand(batch_size, generator=self._generator)
-        samples = torch.stack((radii * torch.cos(angles), radii * torch.sin(angles)), dim=1)
-        return samples.to(device)
-
     def sample_target(self, batch_size: int, device: torch.device) -> torch.Tensor:
         samples = _sample_segments(self.target_segments, batch_size, self._generator, device)
         noise = _sample_noise_like_samples(
@@ -130,7 +128,7 @@ class CircularUniformToLetterMDataset(PairDataset):
         return (samples + noise).to(device)
 
 
-class CircularUniformToMoonDataset(PairDataset):
+class CircularUniformToMoonDataset(CircularSourceDataset):
     """2D dataset mapping a uniform circular source to a two-moon target."""
 
     def __init__(
@@ -142,8 +140,7 @@ class CircularUniformToMoonDataset(PairDataset):
         target_std: float = 0.15,
         seed: int = 42,
     ) -> None:
-        super().__init__(dim=2, seed=seed)
-        self.source_radius = source_radius
+        super().__init__(source_radius=source_radius, seed=seed)
         self.target_radius = target_radius
         horizontal_gap = target_radius if target_horizontal_gap is None else target_horizontal_gap
         self.target_horizontal_gap = horizontal_gap
@@ -155,14 +152,6 @@ class CircularUniformToMoonDataset(PairDataset):
         self.lower_center = torch.tensor(
             (horizontal_gap / 2.0, -target_vertical_gap / 2.0), dtype=torch.float32
         )
-
-    def sample_base(self, batch_size: int, device: torch.device) -> torch.Tensor:
-        radii = self.source_radius * torch.sqrt(
-            torch.rand(batch_size, generator=self._generator)
-        )
-        angles = 2.0 * math.pi * torch.rand(batch_size, generator=self._generator)
-        samples = torch.stack((radii * torch.cos(angles), radii * torch.sin(angles)), dim=1)
-        return samples.to(device)
 
     def sample_target(self, batch_size: int, device: torch.device) -> torch.Tensor:
         component_idx = torch.randint(
@@ -197,7 +186,7 @@ class CircularUniformToMoonDataset(PairDataset):
         return samples.to(device)
 
 
-class CircularUniformToCheckerboardGridDataset(PairDataset):
+class CircularUniformToCheckerboardGridDataset(CircularSourceDataset):
     """2D dataset mapping a uniform circular source to a checkerboard 4x4 grid target."""
 
     def __init__(
@@ -208,8 +197,7 @@ class CircularUniformToCheckerboardGridDataset(PairDataset):
         target_std: float = 0.2,
         seed: int = 42,
     ) -> None:
-        super().__init__(dim=2, seed=seed)
-        self.source_radius = source_radius
+        super().__init__(source_radius=source_radius, seed=seed)
         self.grid_size = grid_size
         self.grid_spacing = grid_spacing
         self.target_std = target_std
@@ -226,14 +214,6 @@ class CircularUniformToCheckerboardGridDataset(PairDataset):
                         )
                     )
         self.target_centers = torch.tensor(centers, dtype=torch.float32)
-
-    def sample_base(self, batch_size: int, device: torch.device) -> torch.Tensor:
-        radii = self.source_radius * torch.sqrt(
-            torch.rand(batch_size, generator=self._generator)
-        )
-        angles = 2.0 * math.pi * torch.rand(batch_size, generator=self._generator)
-        samples = torch.stack((radii * torch.cos(angles), radii * torch.sin(angles)), dim=1)
-        return samples.to(device)
 
     def sample_target(self, batch_size: int, device: torch.device) -> torch.Tensor:
         component_idx = torch.randint(

@@ -33,7 +33,7 @@ def run_smoke(output_dir: str | Path) -> Path:
         "dataset": {"name": "ffhq_latent", "params": {
             "train_npz_path": "{data_root}/train.npz", "test_npz_path": "{data_root}/test.npz"}},
         "architecture": {"name": "ffhq_latent_mlp", "params": {"hidden_sizes": [16, 16], "class_embedding_dim": 4}},
-        "method": {"name": "drift_flow_matching", "params": {"drift_form": "split_v0", "groups_per_class": 1, "sinkhorn_iters": 2}},
+        "method": {"name": "drift_flow_matching", "params": {"groups_per_class": 1, "sinkhorn_iters": 2}},
         "trainer": {"epochs": 1, "steps_per_epoch": 2, "batch_size": 12, "device": "cpu", "checkpoint_every": 1},
         "evaluation": {"evaluator": "ffhq", "num_sampling_steps": [1, 2], "sample_every": 0,
             "run_final": False, "metrics": ["latent_ot"], "params": {"n_per_class": 4, "device": "cpu"}},

@@ -34,22 +34,8 @@ class _FastUMAP:
         return centered[:, :2]
 
 
-class _FastTSNE:
-    def __init__(self, **kwargs) -> None:
-        self.kwargs = kwargs
-
-    def fit_transform(self, points: np.ndarray) -> np.ndarray:
-        centered = np.asarray(points, dtype=np.float32) - np.asarray(points, dtype=np.float32).mean(axis=0)
-        if centered.shape[1] == 1:
-            return np.concatenate([centered, np.zeros((centered.shape[0], 1), dtype=np.float32)], axis=1)
-        return centered[:, :2]
-
-
 @pytest.fixture(autouse=True)
 def _fast_projection_backends(monkeypatch: pytest.MonkeyPatch) -> None:
-    import sklearn.manifold
-
-    monkeypatch.setattr(sklearn.manifold, "TSNE", _FastTSNE)
     monkeypatch.setitem(sys.modules, "umap", SimpleNamespace(UMAP=_FastUMAP))
 
 
@@ -95,16 +81,6 @@ def _assert_projection_payload(payload: dict[str, object], *, method_name: str) 
     assert real_only_plot_path.exists()
     assert generated_only_plot_path.exists()
     assert projection_path.exists()
-
-    if method_name == "tsne":
-        assert f"{method_name}_real_fit_plot_path" not in payload
-        _assert_projection_artifacts(
-            method_name,
-            [plot_path, real_only_plot_path, generated_only_plot_path],
-            [projection_path],
-            expected_fit_bases={"fake_real"},
-        )
-        return
 
     real_fit_plot_path = Path(str(payload[f"{method_name}_real_fit_plot_path"]))
     real_fit_real_only_plot_path = Path(str(payload[f"{method_name}_real_fit_real_only_plot_path"]))
@@ -194,7 +170,7 @@ def test_ffhq_evaluator_supports_pca_for_classes(
             "trainer": {"device": "cpu"},
             "evaluation": {
                 "evaluator": "ffhq",
-                "metrics": ["latent_ot", "pca", "tsne", "umap", "lda"],
+                "metrics": ["latent_ot", "pca", "umap"],
                 "params": {
                     "real_npz": str(synthetic_ffhq_npz["test_npz"]),
                     "device": "cpu",
@@ -233,7 +209,7 @@ def test_ffhq_evaluator_supports_pca_for_classes(
     sampled_latents_path = Path(payload["sampled_latents_npz"])
     assert sampled_latents_path.exists()
     _assert_sampled_latents_npz(sampled_latents_path, class_names=ffhq_eval.FFHQ_CLASS_NAMES)
-    for method_name in ("pca", "tsne", "umap", "lda"):
+    for method_name in ("pca", "umap"):
         _assert_projection_payload(payload, method_name=method_name)
     assert set(fake_method.calls) == {(3, None)}
 

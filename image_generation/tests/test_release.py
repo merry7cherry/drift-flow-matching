@@ -39,7 +39,7 @@ def test_sampler_decodes_images_without_training_data(tmp_path, dataset_name, nu
     from PIL import Image
     from driftfm.architectures import ConditionalTimeMLP, MnistConvAE, FFHQALAE, FFHQALAEConfig
     from driftfm.training.checkpoints import save_checkpoint
-    params = dict(data_dim=latent_dim, hidden_sizes=[16, 16], num_classes=num_classes, conditioning_mode='class', class_embedding_dim=4)
+    params = dict(data_dim=latent_dim, hidden_sizes=[16, 16], num_classes=num_classes, class_embedding_dim=4)
     model = ConditionalTimeMLP(**params)
     checkpoint_path = tmp_path / 'generator.pt'
     save_checkpoint(checkpoint_path, {

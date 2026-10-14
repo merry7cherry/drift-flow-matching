@@ -3,12 +3,13 @@ from __future__ import annotations
 from typing import Any
 
 from ..config import DriftFlowMatchingConfig, MethodSection
+from ..config.compat import normalize_method_params
 from .base import GenerativeMethod
 from .drift_flow_matching import DriftFlowMatchingMethod
 
 
 def _build_drift_flow_matching(params: dict[str, Any]) -> GenerativeMethod:
-    config = DriftFlowMatchingConfig(**params)
+    config = DriftFlowMatchingConfig(**normalize_method_params(params))
     return DriftFlowMatchingMethod(config=config)
 
 

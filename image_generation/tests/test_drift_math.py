@@ -169,9 +169,6 @@ def test_sample_requires_explicit_positive_num_steps(torch_device):
         method.sample(model, noise, num_steps=0)
 
 
-def test_method_rejects_legacy_split_drift_form() -> None:
-    with pytest.raises(ValueError, match="Only drift_form in"):
-        dfm.DriftFlowMatchingMethod(config.DriftFlowMatchingConfig(drift_form="split"))
 
 
 
@@ -188,8 +185,3 @@ def test_mainline_loss_is_finite_and_differentiable(torch_device):
     output.loss.backward()
     assert torch.isfinite(output.loss)
     assert all(p.grad is not None and torch.isfinite(p.grad).all() for p in model.parameters())
-
-
-def test_non_mainline_method_rejected():
-    with pytest.raises(ValueError, match='split_v0'):
-        dfm.DriftFlowMatchingMethod(config.DriftFlowMatchingConfig(drift_form='split_v1'))

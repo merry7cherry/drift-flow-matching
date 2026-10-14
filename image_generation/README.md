@@ -2,7 +2,7 @@
 
 Class-conditional latent generation on MNIST and FFHQ. A single model accepts the state, start time, and interval length, and supports one-step or multi-step sampling.
 
-This release contains the class-conditional formulation (`split_v0` in the original implementation). The supplied training configurations are reconstructed from the research code and matched to the paper's formulation. The original image experiment checkpoints and complete result provenance are not included, so these configurations are not claimed to reproduce the paper's numerical tables exactly. Pretrained image model downloads are not available in this release.
+Train the class-conditional models from source with the workflows below. Pretrained DFM checkpoints are not distributed; the [reproduction guide](../reproduction/image_generation.md) records the experiment recipes and result provenance.
 
 ## Install
 
@@ -15,9 +15,9 @@ python -m pip install --upgrade pip
 python -m pip install -c constraints-tested.txt -e '.[eval,dev]'
 ```
 
-Install a PyTorch build appropriate for your CUDA environment before this command if needed. The package itself also supports CPU execution. Full image training and high-resolution FFHQ decoding have not been benchmarked on CPU; use the small smoke check below for installation validation.
+Install a PyTorch build appropriate for your CUDA environment before this command if needed. The package also supports CPU execution; the small smoke check below validates installation.
 
-The base package provides training, sampling, and preprocessing. `eval` adds OT, FID and optional projection metrics. `data` adds the optional FFHQ downloader. No cluster account, scheduler, deployment scripts, or machine-specific paths are required.
+The base package provides training, sampling, and preprocessing. `eval` adds OT, FID and optional projection metrics. `data` adds the optional FFHQ downloader. Paths and devices are configured locally.
 
 ## First run: a small CPU check
 
@@ -25,7 +25,7 @@ The base package provides training, sampling, and preprocessing. `eval` adds OT,
 driftfm-smoke --output-dir ./runs/smoke
 ```
 
-This generates synthetic six-class, four-dimensional latents, runs two optimizer steps, saves an EMA checkpoint, reloads it, samples at NFE 1 and 2, and evaluates latent OT. It downloads no data or models. `smoke_result.json` records the outputs. This checks the software pipeline; it does not measure MNIST or FFHQ generation quality.
+This generates synthetic six-class, four-dimensional latents, runs two optimizer steps, saves an EMA checkpoint, reloads it, samples at NFE 1 and 2, and evaluates latent OT. It downloads no data or models. `smoke_result.json` records the outputs.
 
 ## Train and sample
 
@@ -87,7 +87,7 @@ Keep the dataset, model and optimization settings unchanged when resuming. Incre
 - `src/driftfm/architectures/`: conditional MLP and image encoders/decoders.
 - `src/driftfm/data/`: balanced class latent datasets.
 - `src/driftfm/training/`: optimizer loop, checkpoint recovery and EMA.
-- `src/driftfm/evaluation/`: latent/image OT, classifier accuracy, ALAE-decoded FID and optional projections.
+- `src/driftfm/evaluation/`: latent/image OT, classifier accuracy, ALAE-decoded FID and paper PCA/UMAP visualizations.
 - `src/driftfm/tasks/`: command-line entrypoints.
 
 ```bash
@@ -95,6 +95,6 @@ python -m pip install -e '.[eval,dev,data]'
 python -m pytest -q
 ```
 
-Tests cover drift math, labels, data preprocessing, checkpoint resume/RNG state, evaluation inputs and cache behavior, configurable paths, and synthetic train/sample/evaluate. The release cleanup was also checked against the original `split_v0` implementation: a fixed CPU fixture produced identical loss, parameter gradients, drift and NFE 1/2/5 samples. These checks do not verify full GPU training or historical paper metrics.
+Tests cover drift math, labels, preprocessing, checkpoint resume/RNG state, evaluation, configurable paths, and synthetic train/sample/evaluate. See the [verification record](../reproduction/VERIFICATION.md) for tested environments and validation scope.
 
 See [method details](docs/methods/drift_flow_matching.md), [architecture](docs/architecture.md), and the repository's [reproduction guide](../reproduction/image_generation.md). ALAE-derived code retains its upstream copyright and Apache 2.0 notice; see the root [third-party notices](../THIRD_PARTY_NOTICES.md).

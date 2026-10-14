@@ -67,9 +67,9 @@ The full configuration uses batch size 3,072 and 200 epochs of 100 optimizer ste
 
 ## Evaluation semantics
 
-The default metrics are per-class latent OT and FID. The reference pool is explicitly the held-out test latent NPZ. There is no fallback to training data if that test file is missing.
+The default metrics are per-class latent OT and FID. Select `metrics: [latent_ot, fid, pca, umap]` to also produce the paper's latent visualizations. The reference pool is explicitly the held-out test latent NPZ. There is no fallback to training data if that test file is missing.
 
-**The inherited FID compares decoded generated latents against ALAE reconstructions of the real test latents, not raw original FFHQ images.** Both distributions use the same frozen decoder. Its result is not interchangeable with raw-image-reference FFHQ FID. `fid_decode_noise: true` in the evaluation config enables decoder noise on both real and generated images, with recorded seed; the sample CLI's presentation grids use `noise=False`.
+**The inherited FID compares decoded generated latents against ALAE reconstructions of the real test latents, not raw original FFHQ images.** Both distributions use the same frozen decoder. Its result is not interchangeable with raw-image-reference FFHQ FID. Decoder noise is enabled by default for both real and generated FID images, with recorded seed, in the YAML configuration and the standalone evaluator. Use `--no-fid-decode-noise` with `driftfm-eval-ffhq` to disable it explicitly; `--fid-decode-noise` remains available. The sample CLI's presentation grids use `noise=False`.
 
 Real decoded image caches are reused only when the recorded source/decoder/seed/settings and actual image counts match. Each NFE has separate generated-image artifacts. For latent-only evaluation, remove `fid` from an evaluation configuration or run:
 
@@ -79,4 +79,4 @@ driftfm-eval-ffhq --checkpoint /path/to/generator.pt \
   --metrics latent_ot --num-sampling-steps 1 2 5 --device cpu
 ```
 
-A full FID run may download the evaluator's Inception weights. Exact historical table reproduction remains pending the original split, ALAE and generator checkpoints, evaluation settings and run records.
+A full FID run may download the evaluator's Inception weights. See the [reproduction guide](../../../reproduction/image_generation.md) for the experiment recipe and result provenance.

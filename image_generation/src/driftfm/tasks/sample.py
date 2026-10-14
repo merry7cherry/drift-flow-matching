@@ -28,9 +28,6 @@ def sample_checkpoint(
         raise ValueError("steps, samples_per_class, and batch_size must be positive")
     checkpoint_path = normalize_path(checkpoint_path, resolve_latest=True)
     checkpoint = load_checkpoint(checkpoint_path)
-    mode = checkpoint["resolved_architecture"]["params"].get("conditioning_mode", "class")
-    if mode != "class":
-        raise ValueError("This release supports class-conditional DFM checkpoints.")
     configure_determinism(seed, deterministic=True, device=device)
     torch_device = torch.device(device)
     model, method = load_generation_stack(checkpoint, torch_device)

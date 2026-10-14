@@ -4,6 +4,7 @@ from copy import deepcopy
 from typing import Callable, List
 
 import torch
+import torch.nn.functional as F
 from torch.func import jvp
 
 from ..configs import (
@@ -12,22 +13,12 @@ from ..configs import (
     TrainingConfig,
 )
 from ..data.base import PairDataset
-from ..flows.linear import LinearInterpolationFlow
 from ..flows.time_sampling import (
     sample_drift_timestep,
     sample_two_timesteps_t_r_v1,
 )
-from ..models.mlp import (
-    DriftFlowVelocityMLP,
-    MeanVelocityMLP,
-    VelocityMLP,
-)
-from ..training.trainer import TrainingHistory, train_model
-from .artifacts import (
-    DriftFlowMatchingExperimentArtifacts,
-    ExperimentArtifacts,
-    MeanFlowExperimentArtifacts,
-)
+from ..models.mlp import TwoTimeVelocityMLP, VelocityMLP
+from .artifacts import ExperimentArtifacts, TrainingHistory
 
 
 def _sinkhorn_from_logits_batched(
@@ -104,8 +95,8 @@ def compute_drift_batched_sinkhorn(
         raise ValueError("gen and pos must share the same feature dimension")
 
     _, group_batch_size, _ = gen.shape
-    if group_batch_size < 2:
-        return torch.zeros_like(gen)
+    if group_batch_size < 1:
+        raise ValueError("gen must be non-empty within each group")
 
     pos_group_size = pos.shape[1]
     if pos_group_size < 1:
@@ -208,23 +199,28 @@ def train_flow_matching(
     hidden_sizes: list[int] | None = None,
 ) -> ExperimentArtifacts:
     model = VelocityMLP(dim=dataset.dim, hidden_sizes=hidden_sizes)
-    objective = LinearInterpolationFlow()
-    history = train_model(model, dataset, objective, training_config)
-    return ExperimentArtifacts(model=model, history=history)
+    device = torch.device(training_config.device)
+    model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=training_config.learning_rate)
+    losses: list[float] = []
 
+    for _ in range(training_config.epochs):
+        epoch_loss = 0.0
+        for _ in range(training_config.steps_per_epoch):
+            batch = dataset.sample_pairs(training_config.batch_size, device)
+            t = torch.rand(training_config.batch_size, 1, device=device)
+            xt = (1.0 - t) * batch.x0 + t * batch.x1
+            target_velocity = batch.x1 - batch.x0
+            predicted_velocity = model(xt, t)
+            loss = F.mse_loss(predicted_velocity, target_velocity)
 
-def _compute_adaptive_matching_loss(
-    prediction: torch.Tensor,
-    target: torch.Tensor,
-    norm_eps: float,
-    norm_p: float,
-) -> torch.Tensor:
-    """Apply the adaptive residual reduction to a batch of predictions [B, ...]."""
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss.item()
+        losses.append(epoch_loss / training_config.steps_per_epoch)
 
-    loss_terms = (prediction - target) ** 2
-    loss_terms = loss_terms.reshape(loss_terms.shape[0], -1).sum(dim=1)
-    adaptive_weight = (loss_terms.detach() + norm_eps) ** norm_p
-    return torch.mean(loss_terms / adaptive_weight)
+    return ExperimentArtifacts(model=model, history=TrainingHistory(losses))
 
 
 def _expand_groupwise_timesteps(
@@ -290,7 +286,7 @@ def _flatten_grouped_samples(tensor: torch.Tensor) -> torch.Tensor:
 
 
 def _predict_drift_reference_state(
-    model: DriftFlowVelocityMLP,
+    model: TwoTimeVelocityMLP,
     xt: torch.Tensor,
     t: torch.Tensor,
     delta: torch.Tensor,
@@ -345,16 +341,18 @@ def _train_drift_flow_matching_batched(
     dataset: PairDataset,
     training_config: TrainingConfig,
     drift_config: DriftFlowMatchingConfig,
-    model: DriftFlowVelocityMLP,
+    model: TwoTimeVelocityMLP,
     optimizer: torch.optim.Optimizer,
     device: torch.device,
     ema_model: torch.nn.Module | None = None,
 ) -> list[float]:
     """Batched drift FM path that evaluates all group drifts in one tensor pass."""
 
+    if drift_config.batch_groups < 1:
+        raise ValueError("batch_groups must be positive")
     if training_config.batch_size % drift_config.batch_groups != 0:
         raise ValueError(
-            "drift_impl='batched' requires batch_size to be divisible by "
+            "DFM requires batch_size to be divisible by "
             f"batch_groups, but got batch_size={training_config.batch_size} "
             f"and batch_groups={drift_config.batch_groups}."
         )
@@ -420,10 +418,8 @@ def _train_drift_flow_matching_batched(
                 xr_group,
                 compute_group_drift,
             )
-            loss = _compute_adaptive_matching_loss(
-                predicted_xr_flat, _flatten_grouped_samples(target_group),
-                drift_config.norm_eps, drift_config.norm_p,
-            )
+            residual = predicted_xr_flat - _flatten_grouped_samples(target_group)
+            loss = residual.square().sum(dim=1).mean()
 
             _run_optimizer_step(
                 optimizer,
@@ -445,11 +441,11 @@ def train_drift_flow_matching(
     dataset: PairDataset,
     training_config: TrainingConfig,
     drift_config: DriftFlowMatchingConfig,
-) -> DriftFlowMatchingExperimentArtifacts:
+) -> ExperimentArtifacts:
     """Train Drift Flow Matching with grouped, batched Sinkhorn drift."""
 
     device = torch.device(training_config.device)
-    model = DriftFlowVelocityMLP(
+    model = TwoTimeVelocityMLP(
         dim=dataset.dim, hidden_sizes=list(drift_config.velocity_hidden_sizes)
     ).to(device)
     ema_model = _build_ema_model(model) if drift_config.use_ema else None
@@ -460,16 +456,16 @@ def train_drift_flow_matching(
 
     history = TrainingHistory(losses=losses)
     artifact_model = ema_model if ema_model is not None else model
-    return DriftFlowMatchingExperimentArtifacts(model=artifact_model, history=history)
+    return ExperimentArtifacts(model=artifact_model, history=history)
 
 
 def train_mean_flow_matching(
     dataset: PairDataset,
     training_config: TrainingConfig,
     mean_config: MeanFlowConfig,
-) -> MeanFlowExperimentArtifacts:
+) -> ExperimentArtifacts:
     device = torch.device(training_config.device)
-    model = MeanVelocityMLP(
+    model = TwoTimeVelocityMLP(
         dim=dataset.dim, hidden_sizes=list(mean_config.velocity_hidden_sizes)
     ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=training_config.learning_rate)
@@ -522,7 +518,7 @@ def train_mean_flow_matching(
         losses.append(epoch_loss / steps)
 
     history = TrainingHistory(losses=losses)
-    return MeanFlowExperimentArtifacts(model=model, history=history)
+    return ExperimentArtifacts(model=model, history=history)
 
 
 __all__ = ["train_flow_matching", "train_drift_flow_matching", "train_mean_flow_matching"]

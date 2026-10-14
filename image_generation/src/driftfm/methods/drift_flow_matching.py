@@ -18,14 +18,6 @@ from .base import GenerativeMethod, LossOutput
 # D: flattened feature dimension
 # *shape: original data shape, such as image or latent dimensions
 
-_SUPPORTED_DRIFT_FORMS = {"split_v0"}
-
-
-def conditioning_mode_for_drift_form(drift_form: str) -> str:
-    if drift_form != "split_v0":
-        raise ValueError("This release supports the class-conditional split_v0 formulation only")
-    return "class"
-
 
 def logit_normal_timestep_sample(
     P_mean: float,
@@ -248,14 +240,12 @@ def compute_drift_grouped_sinkhorn(
     gen: torch.Tensor,
     pos: torch.Tensor,
     *,
-    drift_form: str = "split_v0",
     kernel_temp_pos: float = 0.05,
     kernel_temp_neg: float = 0.05,
     num_sinkhorn_iters: int = 20,
     eps: float = 1e-12,
 ) -> torch.Tensor:
     """Same-class attraction minus generated-sample repulsion, shape [G, B, D]."""
-    conditioning_mode_for_drift_form(drift_form)
     if gen.ndim != 3 or pos.shape != gen.shape:
         raise ValueError("gen and pos must share shape [G, B, D]")
     if kernel_temp_pos <= 0 or kernel_temp_neg <= 0:
@@ -309,6 +299,8 @@ def _validate_flat_class_labels(
         max_allowed_label: Maximum allowed label.
         label_name: Error-label for validation.
     """
+    if class_labels.dtype != torch.long:
+        raise ValueError(f"{label_name} must use torch.long class indices")
     if class_labels.ndim != 1 or class_labels.shape[0] != expected_batch_size:
         raise ValueError(f"{label_name} must have shape [{expected_batch_size}], got {tuple(class_labels.shape)}")
     if class_labels.numel() == 0:
@@ -494,23 +486,11 @@ def _flatten_group_features(group_tensor: torch.Tensor) -> torch.Tensor:
     return group_tensor.reshape(group_tensor.shape[0], group_tensor.shape[1], -1)
 
 
-def _validate_supported_config(config: DriftFlowMatchingConfig) -> None:
-    """Validate the currently supported Sinkhorn drift configuration.
-
-    Args:
-        config: Drift Flow Matching config.
-    """
-    if config.drift_form not in _SUPPORTED_DRIFT_FORMS:
-        supported = ", ".join(sorted(_SUPPORTED_DRIFT_FORMS))
-        raise ValueError(f"Only drift_form in {{{supported}}} is supported, got {config.drift_form!r}")
-    if config.sinkhorn_iters <= 0:
-        raise ValueError("sinkhorn_iters must be > 0")
-
-
 class DriftFlowMatchingMethod(GenerativeMethod):
     def __init__(self, config: DriftFlowMatchingConfig | None = None) -> None:
         self.config = config or DriftFlowMatchingConfig()
-        _validate_supported_config(self.config)
+        if self.config.sinkhorn_iters <= 0:
+            raise ValueError("sinkhorn_iters must be > 0")
 
     @property
     def uses_ema(self) -> bool:
@@ -565,7 +545,7 @@ class DriftFlowMatchingMethod(GenerativeMethod):
             max_allowed_label=num_classes - 1,
             label_name="batch.conditioning.class_labels",
         )
-        cond = Conditioning(class_labels=class_labels)
+        cond = Conditioning(class_labels=class_labels.to(device=batch.x0.device))
 
         predicted_velocity = model(x_t, t, h, conditioning=cond)
         x_r_pred = x_t + h * predicted_velocity
@@ -575,7 +555,6 @@ class DriftFlowMatchingMethod(GenerativeMethod):
         drift = compute_drift_grouped_sinkhorn(
             gen=gen,
             pos=pos,
-            drift_form=self.config.drift_form,
             kernel_temp_pos=self.config.kernel_temp_pos,
             kernel_temp_neg=self.config.kernel_temp_neg,
             num_sinkhorn_iters=self.config.sinkhorn_iters,
@@ -590,14 +569,7 @@ class DriftFlowMatchingMethod(GenerativeMethod):
             self.config.norm_eps,
             self.config.norm_p,
         )
-        total_loss = drift_loss
-
-        metrics = {
-            "loss": float(total_loss.detach().item()),
-            "drift_loss": float(drift_loss.detach().item()),
-            "conditional_mass_mean": 1.0,
-        }
-        return LossOutput(loss=total_loss, metrics=metrics)
+        return LossOutput(loss=drift_loss, metrics={"loss": float(drift_loss.detach().item())})
 
     def sample(
         self,
@@ -613,13 +585,24 @@ class DriftFlowMatchingMethod(GenerativeMethod):
             model: Velocity network mapping `(x_t, t, h, conditioning)` to velocity.
             x0: Initial noise or source batch with shape `[N, *shape]`.
             conditioning: Optional conditioning carrying `class_labels`.
-            num_steps: Euler integration step count.
+            num_steps: Number of learned transport intervals (NFE).
 
         Returns:
             Sampled tensor with shape `[N, *shape]`.
         """
         if num_steps <= 0:
             raise ValueError("num_steps must be positive")
+        if conditioning is not None and conditioning.class_labels is not None:
+            conditioning = conditioning.to(x0.device)
+            num_classes = getattr(model, "num_classes", None)
+            if num_classes is not None:
+                _validate_flat_class_labels(
+                    conditioning.class_labels,
+                    expected_batch_size=x0.shape[0],
+                    min_allowed_label=0,
+                    max_allowed_label=num_classes - 1,
+                    label_name="conditioning.class_labels",
+                )
         was_training = model.training
         model.eval()
         current = x0

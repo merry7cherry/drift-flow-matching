@@ -11,7 +11,6 @@ from ..architectures import create_architecture
 from ..config import ArchitectureSection, ExperimentConfig, MethodSection
 from ..data import Conditioning
 from ..methods import create_method
-from ..methods.drift_flow_matching import conditioning_mode_for_drift_form
 from ..utils import make_torch_generator
 from .projection import PROJECTION_METHODS, ProjectionArtifacts, write_projection_artifacts
 
@@ -36,28 +35,6 @@ def resolve_evaluation_seed(experiment: ExperimentConfig) -> int:
     if seed < 0:
         raise ValueError("evaluation.params.seed must be an integer >= 0")
     return seed
-
-def resolve_evaluation_conditioning_mode(
-    experiment: ExperimentConfig,
-    checkpoint: dict[str, Any],
-) -> str:
-    resolved = checkpoint.get("resolved_architecture", {})
-    resolved_params = dict(resolved.get("params", {}))
-    if resolved_params.get("conditioning_mode") is not None:
-        return str(resolved_params["conditioning_mode"])
-
-    if experiment.architecture.params.get("conditioning_mode") is not None:
-        return str(experiment.architecture.params["conditioning_mode"])
-
-    method_payload = checkpoint.get("experiment", {}).get("method", {})
-    drift_form = str(
-        method_payload.get("params", {}).get(
-            "drift_form",
-            experiment.method.params.get("drift_form", "split_v0"),
-        )
-    )
-    return conditioning_mode_for_drift_form(drift_form)
-
 
 def load_generation_stack(
     checkpoint: dict[str, Any],

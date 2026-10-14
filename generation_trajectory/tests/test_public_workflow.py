@@ -17,7 +17,7 @@ from flowviz.configs import (
     DATASET_CONFIGS, DriftFlowMatchingConfig, IntegratorConfig, MeanFlowConfig,
     TrainingConfig, VisualizationEvalConfig,
 )
-from flowviz.models.mlp import DriftFlowVelocityMLP
+from flowviz.models.mlp import TwoTimeVelocityMLP
 from flowviz.pipelines.checkpoints import load_checkpoint, save_checkpoint
 from flowviz.pipelines.inference import compute_drift_flow_matching_trajectories
 from flowviz.pipelines.training import (
@@ -101,6 +101,56 @@ class PublicWorkflowTest(unittest.TestCase):
             self.assertEqual(len(manifest["checkpoint_sha256"]), 64)
             with np.load(first/f"{KEY}_drift_flow_matching_nfe_1.npz") as one, np.load(first/f"{KEY}_drift_flow_matching_nfe_3.npz") as three:
                 np.testing.assert_array_equal(one["states"][0], three["states"][0])
+
+    def test_singleton_groups_use_conditional_drift_and_train(self):
+        query = torch.tensor([[[1., 2.]], [[-1., 3.]]])
+        target = torch.tensor([[[4., 6.]], [[2., -2.]]])
+        torch.testing.assert_close(compute_drift_batched_sinkhorn(query, target), target - query)
+        self.assertEqual(parse_args(["--batch-size", "4"]).batch_size, 4)
+
+        seed_all(41)
+        initial = TwoTimeVelocityMLP(2).state_dict()
+        seed_all(41)
+        dataset = DATASET_CONFIGS[KEY].create_dataset(41)
+        artifacts = train_drift_flow_matching(
+            dataset, TrainingConfig(1, 4, 2), DriftFlowMatchingConfig(use_ema=False),
+        )
+        self.assertGreater(artifacts.history.losses[0], 0.)
+        self.assertTrue(any(not torch.equal(initial[key], value)
+                            for key, value in artifacts.model.state_dict().items()))
+
+    def test_comparison_uses_shared_bounds_for_all_methods_and_nfe(self):
+        from flowviz.visualization.plotting import create_2d_trajectory_figure
+
+        with TemporaryDirectory() as temp:
+            output = Path(temp)
+            config = VisualizationRunConfig(
+                output, seed=42, training_config=TrainingConfig(1, 16, 2),
+                integrator_config=IntegratorConfig(2), drift_flow_config=DriftFlowMatchingConfig(),
+                mean_flow_config=MeanFlowConfig(), eval_config=VisualizationEvalConfig((1, 3), 8, 8),
+                methods=("drift_flow_matching", "flow_matching", "mean_flow"),
+            )
+            with patch("flowviz.runners.visualization.create_2d_trajectory_figure",
+                       wraps=create_2d_trajectory_figure) as plot:
+                run_visualization_experiments([DATASET_CONFIGS[KEY]], config)
+            self.assertEqual(plot.call_count, 5)
+            bounds = plot.call_args_list[0].kwargs["bounds"]
+            points = []
+            sources = []
+            for path in output.glob("*.npz"):
+                with np.load(path) as trace:
+                    points.extend((trace["states"].reshape(-1, 2), trace["target_samples"]))
+                    sources.append(trace["states"][0])
+            all_points = np.concatenate(points)
+            lower, upper = all_points.min(axis=0), all_points.max(axis=0)
+            padding = np.maximum(upper - lower, 1.0) * 0.05
+            np.testing.assert_array_equal(bounds, (lower - padding, upper + padding))
+            for call in plot.call_args_list:
+                np.testing.assert_array_equal(call.kwargs["bounds"], bounds)
+            for source in sources[1:]:
+                np.testing.assert_array_equal(source, sources[0])
+            for path in output.glob("*.json"):
+                np.testing.assert_array_equal(json.loads(path.read_text())["plot"]["bounds"], bounds)
 
     def test_cli_defaults_and_json_overrides(self):
         args=parse_args([])

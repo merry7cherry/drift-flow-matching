@@ -1,5 +1,4 @@
-# Reconstructed class-conditional DFM configuration.
-# Exact historical checkpoint and result provenance is not available in this release.
+# Class-conditional DFM; see reproduction/image_generation.md for the experiment recipe.
 runtime:
   data_root: ../../data
   runs_root: ../../runs
@@ -20,7 +19,6 @@ method:
   name: drift_flow_matching
   params:
     groups_per_class: 4
-    drift_form: split_v0
     use_ema: true
     ema_decay: 0.999
     P_mean_t: -1.0

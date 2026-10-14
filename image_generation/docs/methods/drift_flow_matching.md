@@ -1,6 +1,6 @@
 # Drift Flow Matching implementation
 
-The public implementation uses the paper's fixed-class drift construction. Each conditional MLP receives `u(x_t, t, h, class_labels)` with interval length `h = r - t`. This is an equivalent coordinate system for the ordered time pair `(t, r)`.
+The public implementation uses the paper's fixed-class drift construction. Each conditional MLP receives `u(x_t, t, h, conditioning)`, where `h = r - t` and `conditioning.class_labels` contains the class indices. This is an equivalent coordinate system for the ordered time pair `(t, r)`.
 
 For a class-balanced batch, the method partitions each class into `groups_per_class` subgroups. A subgroup index shares a sampled pair `0 <= t <= r <= 1` across classes, while each transport problem uses samples from one class only. Time values follow the configured logit-normal laws.
 
@@ -12,10 +12,10 @@ For each group:
 4. Let `drift = projection(y,x_r) - projection(y,y)`.
 5. Regress `y` to the stop-gradient target `y + drift`.
 
-The kernel logits use negative Euclidean distance divided by the configured temperature. The plan is row-normalized before the barycentric projection. `norm_p=0`, as supplied, gives mean squared Euclidean error summed over latent coordinates. EMA is maintained by the trainer and used for sampling/evaluation.
+This is the grouped Sinkhorn implementation in the paper's Appendix **Algorithm 2**: kernel logits are `-torch.cdist(source, target) / temperature` (Euclidean distance), with 20 Sinkhorn iterations in the supplied image configurations and row normalization of the resulting plan. The paper's introductory row-normalized Gibbs drift and default squared cost describe a different concrete kernel recipe; they should not be substituted for Algorithm 2 when running these configurations. `norm_p=0`, as supplied, gives mean squared Euclidean error summed over latent coordinates. EMA is maintained by the trainer and used for sampling/evaluation.
 
 Sampling uses `N` uniform intervals from 0 to 1 and applies `x_next = x + h u(x,t,h,c)` once per interval. NFE therefore equals `N`. Generation uses explicit class labels.
 
-The source research branch also contained guidance experiments. Those variants and their configurations are excluded from this release. Their checkpoints are incompatible with this class-only model. The name `split_v0` remains in configuration as a provenance identifier for the retained formulation.
+The v0.1 configuration names `drift_form: split_v0` and `conditioning_mode: class` are accepted only by the configuration/checkpoint compatibility reader. New configurations use the single class-conditional formulation directly, with the same parameter names and tensor shapes in saved model weights.
 
-Scientific mapping does not establish numerical result provenance: complete original image checkpoints, encoder states, exact data splits and run records are still needed to reproduce the reported tables.
+See the [reproduction guide](../../../reproduction/image_generation.md) for training recipes and the [verification record](../../../reproduction/VERIFICATION.md) for the scope of released results.

@@ -64,6 +64,7 @@ def run_visualization_experiments(
         key = dataset_config.name
         dataset.reset_rng(run_config.seed)
         eval_batch = dataset.sample_pairs(eval_config.eval_samples, device)
+        method_runs = []
         for method in run_config.methods:
             if method not in ALL_METHODS:
                 raise ValueError(f"Unknown method: {method}")
@@ -122,18 +123,6 @@ def run_visualization_experiments(
                     target_samples=eval_batch.x1.detach().cpu().numpy(),
                 )
                 trajectories.append((stem, states, times))
-            # Fix the axes across NFE to make visual comparisons meaningful.
-            points = torch.cat([eval_batch.x1, *[states.flatten(0, 1) for _, states, _ in trajectories]])
-            lower = points.amin(0).detach().cpu().numpy()
-            upper = points.amax(0).detach().cpu().numpy()
-            padding = np.maximum(upper - lower, 1.0) * 0.05
-            bounds = (lower - padding, upper + padding)
-            for stem, states, times in trajectories:
-                fig = create_2d_trajectory_figure(
-                    states, f"{METHOD_LABELS[method]} · NFE {len(times) - 1}",
-                    target_samples=eval_batch.x1, max_display=eval_config.max_display, bounds=bounds,
-                )
-                save_figure(fig, output_dir / f"{stem}.png")
             manifest = {
                 "schema_version": 1, "checkpoint_sha256": hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
                 "checkpoint_name": checkpoint.name, "checkpoint_metadata": metadata,
@@ -143,5 +132,28 @@ def run_visualization_experiments(
                 "trace_semantics": "states[k] is the learned sampler state at times[k]; target_samples are unpaired reference samples, not pathwise ground truth",
                 "provenance": "New run from the public implementation; not a recovered original paper checkpoint.",
             }
+            method_runs.append((trajectories, METHOD_LABELS[method], filename, manifest))
+
+        # One coordinate system per dataset, shared by every method and NFE.
+        points = torch.cat([
+            eval_batch.x1,
+            *[states.flatten(0, 1) for trajectories, _, _, _ in method_runs
+              for _, states, _ in trajectories],
+        ])
+        lower = points.amin(0).detach().cpu().numpy()
+        upper = points.amax(0).detach().cpu().numpy()
+        padding = np.maximum(upper - lower, 1.0) * 0.05
+        bounds = (lower - padding, upper + padding)
+        for trajectories, label, filename, manifest in method_runs:
+            for stem, states, times in trajectories:
+                fig = create_2d_trajectory_figure(
+                    states, f"{label} · NFE {len(times) - 1}",
+                    target_samples=eval_batch.x1, max_display=eval_config.max_display, bounds=bounds,
+                )
+                save_figure(fig, output_dir / f"{stem}.png")
+            manifest["plot"] = {
+                "bounds": [bound.tolist() for bound in bounds],
+                "max_display": eval_config.max_display,
+            }
             (output_dir / f"{filename}.json").write_text(json.dumps(manifest, indent=2) + "\n")
-            print(f"Saved checkpoint metadata, NPZ traces, and PNG figures to {output_dir}", flush=True)
+        print(f"Saved checkpoint metadata, NPZ traces, and PNG figures to {output_dir}", flush=True)

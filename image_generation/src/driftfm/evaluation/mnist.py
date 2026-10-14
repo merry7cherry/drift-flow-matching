@@ -74,7 +74,8 @@ class MNISTClassifier(nn.Module):
 
 class MnistEvaluator(CheckpointEvaluator):
     name = "mnist"
-    supported_metrics = ("latent_ot", "image_ot", "accuracy", "pca", "tsne", "umap", "lda")
+    default_metrics = ("latent_ot", "image_ot", "accuracy")
+    supported_metrics = ("latent_ot", "image_ot", "accuracy", "pca", "umap")
 
     def evaluate(
         self,
@@ -85,7 +86,7 @@ class MnistEvaluator(CheckpointEvaluator):
         output_dir: str | Path,
         num_sampling_steps: int,
     ) -> EvaluationResult:
-        metrics = experiment.evaluation.metrics or list(self.supported_metrics)
+        metrics = experiment.evaluation.metrics or list(MnistEvaluator.default_metrics)
         self.validate_metrics(metrics)
         params = dict(experiment.evaluation.params)
         runtime_roots = resolve_runtime_config(experiment.runtime)
@@ -276,7 +277,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--gen-batch", type=int, default=256)
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--num-sampling-steps", nargs="+", type=int, default=[1, 2, 5, 10, 20, 50])
-    parser.add_argument("--metrics", nargs="*", default=list(MnistEvaluator.supported_metrics))
+    parser.add_argument("--metrics", nargs="*", default=list(MnistEvaluator.default_metrics))
     parser.add_argument("--no-deterministic", action="store_true")
     return parser.parse_args()
 
@@ -472,7 +473,7 @@ def evaluate_mnist_checkpoint(
     runtime_roots = resolve_runtime_config(experiment.runtime)
     classifier_ckpt = _default_classifier_ckpt(runtime_roots) if classifier_ckpt is None else classifier_ckpt
     experiment.evaluation.evaluator = "mnist"
-    experiment.evaluation.metrics = list(metrics or MnistEvaluator.supported_metrics)
+    experiment.evaluation.metrics = list(metrics or MnistEvaluator.default_metrics)
     experiment.evaluation.params = {
         "ae_ckpt": str(normalize_path(ae_ckpt, runtime_roots=runtime_roots, resolve_latest=True)),
         "latent_root": None

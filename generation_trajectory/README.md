@@ -37,7 +37,9 @@ dfm-trajectories --config configs/smoke.json
 `--device cpu` / `--device cuda:0`, `--epochs`, `--steps-per-epoch`,
 `--batch-size`, `--lr`, `--nfe 1 2 5 20`, `--eval-samples`, `--seed`, and
 `--output`. `--threads` controls CPU intra-op threads (default: 1).
-DFM uses four groups: batch size must be divisible by four and at least eight.
+DFM uses four time-pair groups: batch size must be a positive multiple of four.
+A batch of four gives one sample per group (conditional regression); larger groups
+estimate the distribution-level drift.
 JSON config values can be overridden with CLI flags.
 
 ## Generate from a saved model
@@ -54,9 +56,8 @@ This loads the checkpoint and does **no training**. Each dataset/method pair use
 its own named `.pt` file. Checkpoints contain CPU tensor state dictionaries,
 architecture, training configuration, seed, and loss history. DFM checkpoints
 contain EMA inference weights; these files are for inference and replotting,
-not optimizer-resume training. Checkpoint method/dataset mismatches are rejected.
-Use the same evaluation seed and sample count to recover identical source points.
-Exact floating-point agreement across devices or PyTorch versions is not promised.
+not optimizer-resume training. Use the same evaluation seed and sample count to
+recover identical source points.
 
 ## Compare the paper's trajectory tasks
 
@@ -69,13 +70,9 @@ not the quick start. The configuration retains the research code's recovered
 training budget and method hyperparameters, with FM at NFE 50 and DFM/MeanFlow at
 NFE 1 and 20.
 
-**Reproduction boundary:** the historical training commands and checkpoints for
-the original paper figures have not been recovered. This command runs a new
-comparison using the released implementation; it does not certify pixel-exact
-reproduction of those figures. The original figure also includes a one-step
-Drift Models baseline; its training implementation/checkpoint was not present
-in the recovered trajectory source and is not included here. See
-[protocol and provenance](docs/PROTOCOL.md) for the exact scope.
+See the [protocol](docs/PROTOCOL.md) for model and drift settings, and the
+[release scope](../reproduction/README.md) for the relationship between new runs
+and archived paper results.
 
 ## Outputs and their meaning
 
@@ -85,11 +82,11 @@ For each selected method/dataset:
 - `<dataset>_<method>_nfe_<N>.npz`: `times` of shape `[N+1]`, `states` of shape
   `[N+1, samples, 2]`, and `target_samples` of shape `[samples, 2]`.
 - Corresponding `.png`: blue source, red generated endpoint, gray target samples,
-  and lines connecting the actual sampler states. Axes are fixed across NFE
-  for each method. Only the selected `--max-display` paths/source points are drawn;
+  and lines connecting the actual sampler states. Axes are fixed across all
+  selected methods and NFE for each dataset. Only the selected `--max-display` paths/source points are drawn;
   all generated endpoints and target samples are shown.
 - `<dataset>_<method>.json`: complete checkpoint metadata, evaluation settings,
-  dataset parameters, checkpoint SHA-256, and trace filenames.
+  dataset parameters, checkpoint SHA-256, shared plot bounds, and trace filenames.
 
 Target samples show a distribution. They are **not pathwise ground truth** for
 the generated trajectories. All selected methods and NFE use the same source
@@ -107,14 +104,14 @@ print(trace["states"].shape, trace["times"])
 The DFM objective is in `src/flowviz/pipelines/training.py`; the sampler is in
 `src/flowviz/pipelines/inference.py`. Method hyperparameters are in
 `src/flowviz/configs/methods.py`, and dataset definitions are in
-`src/flowviz/data/synthetic.py`. The public DFM objective uses grouped cross-minus-self
-Sinkhorn drift with a stopped-gradient state target. It has no auxiliary
-flow-matching or self-consistency objective.
+`src/flowviz/data/synthetic.py`. The drift computation follows Appendix
+Algorithm 2: grouped cross-minus-self Sinkhorn drift with Euclidean-distance
+logits. DFM regresses a stopped-gradient state target.
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-The tests cover drift invariances, actual optimizer updates for all three methods,
-checkpoint round trips, matched-source exports, load-without-training, and CLI
-validation. CUDA execution requires verification on a CUDA machine.
+The tests cover drift invariances, single-sample groups, optimizer updates,
+checkpoint round trips, matched-source exports, shared comparison axes,
+load-without-training, and CLI validation.

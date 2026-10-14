@@ -6,7 +6,6 @@ from dataclasses import dataclass
 @dataclass(slots=True)
 class DriftFlowMatchingConfig:
     groups_per_class: int = 4
-    drift_form: str = "split_v0"
     use_ema: bool = True
     ema_decay: float = 0.999
     P_mean_t: float = -1.0

@@ -24,6 +24,4 @@ Retain the exact autoencoder, classifier, generator checkpoint, resolved config,
 
 Record split membership, preprocessing, decoder checkpoint, decoder noise setting, model checkpoint, seed, number of generated/real samples, and FID implementation. A raw-image reference FID is a different metric and should be labeled separately.
 
-## Available evidence
-
-Public configs implement the manuscript's method and the available source settings. They are not recovered historical training manifests. The original image checkpoints are absent, and their training/selection provenance remains unavailable. Small CPU workflow checks do not establish full-data quality, CUDA behavior, or the paper's numbers. Reproducing full benchmarks requires supplying the datasets and completing the documented training and evaluation.
+For the relationship between public training configurations and the paper results, see the [reproduction guide](README.md).

@@ -7,9 +7,25 @@ The project page uses archived manuscript figures and the values reported in its
 | Asset family | Manuscript source | Processing and meaning |
 |---|---|---|
 | `ffhq-nfe-{1,2,5,10}.jpg` | `img/optimized/result_FFHQ/ffhq_fake_steps_grid_step_{N}.pdf` | Existing complete-page raster exports, maximum dimension 1800 pixels. Captions and embedded titles agree with these NFE values. Selection and seed pairing are not recoverable; these are not established paired-seed comparisons. |
+| `ffhq-{pca,umap}-nfe-{1,2,5,10}.jpg` | `img/optimized/img_FFHQ/`, included by `img/img_FFHQ.tex` | Eight unchanged JPGs. NFE follows the corresponding manuscript column caption; the source mapping is recorded below. Filled markers are generated latents and outlined markers are real latents. |
 | `{dataset}-{method}.jpg` | `img/optimized/img_viz/2d_circular_uniform_to_{dataset}_{method}.jpg`, included by `img/img_viz.tex` | Unchanged optimized JPGs. The four datasets are moon, checkerboard_grid, letter_f and letter_m. Methods follow the manuscript labels: Flow Matching 50, Mean Flow 1/20, Drift Model 1, and DFM 1/20. |
-| `{dataset}-ground_truth.jpg` | `img/optimized/img_viz/2d_circular_uniform_to_{dataset}_ground_truth.jpg`, included by `img/img_viz.tex` | Four unchanged reference panels. Blue is the circular source distribution and red is the target distribution; these panels are not generated samples. |
+| `{dataset}-ground_truth.jpg` | `img/optimized/img_viz/2d_circular_uniform_to_{dataset}_ground_truth.jpg`, included by `img/img_viz.tex` | Four unchanged first-column panels, labeled **Ground Truth** in the paper. Blue is the circular source distribution and red is the target distribution. |
 | `group-{panel}.jpg` | `img/optimized/img_group_drift/`, included by `img/img_group_drift.tex` | Five unchanged grouped-drift illustration panels, mapped below. These show separate time-pair groups, not successive frames from a sampling trajectory. |
+
+### FFHQ latent coverage
+
+The active figure `fig:ffhq_latent_inference_steps` in `img/img_FFHQ.tex` defines the presentation: PCA is the top row, UMAP the bottom row, and the four columns are labeled NFE 1, 2, 5 and 10. The page follows those column captions. Original filename suffixes are retained in the manifest as source identifiers, not used to infer the displayed NFE.
+
+| Paper column | Paper NFE | Original PCA filename | Original UMAP filename |
+|---|---|---|---|
+| 1 | 1 | `latent_pca_real_fit_1.jpg` | `latent_umap_real_fit_1.jpg` |
+| 2 | 2 | `latent_pca_real_fit_5.jpg` | `latent_umap_real_fit_5.jpg` |
+| 3 | 5 | `latent_pca_real_fit_10.jpg` | `latent_umap_real_fit_10.jpg` |
+| 4 | 10 | `latent_pca_real_fit_50.jpg` | `latent_umap_real_fit_50.jpg` |
+
+All eight images were inspected and contain no embedded NFE title that conflicts with the manuscript captions. Each manifest entry records the source image hash, copied asset hash, figure-source hash, projection, column and NFE. This establishes fidelity to the paper's presentation; historical checkpoints and paired-seed records remain unavailable.
+
+### Grouped drift
 
 The grouped-drift mapping preserves the manuscript panel order:
 
@@ -23,7 +39,7 @@ The grouped-drift mapping preserves the manuscript panel order:
 
 In the four time-pair panels, red denotes the target-time marginal, green denotes model output under the same model parameters, and dark arrows denote the grouped drift field. The grouping and colors follow the figure caption. These archived model visualizations have not been linked to recovered checkpoints.
 
-MNIST class-grid and FFHQ latent-projection figures remain outside the NFE selector because stored filenames and manuscript NFE labels disagree. The page does not resolve those disagreements by relabeling figures.
+MNIST's three class-grid / UMAP pairs in `img/img_MNIST.tex` similarly have paper column labels 1, 2 and 10 and source suffixes 1, 10 and 50. The inspected images have no embedded NFE title. These images are not included in the current page; the MNIST quantitative results are included below.
 
 ## Quantitative data
 
@@ -43,7 +59,15 @@ From the repository root:
 python scripts/check_site.py
 ```
 
-This checks local page references, exact expected figure names/source mappings, artifact hashes, the grouped-panel time pairs, and result structure. The figure count is derived from the supported asset families rather than a fixed total.
+This checks page references, figure source mappings and hashes, paper column labels, and result structure. It also compares the generated HTML cards, tables and initial FFHQ metrics against `results.json`. Interactive FFHQ metrics read the same generated table.
+
+After changing result data, regenerate the static HTML blocks with:
+
+```bash
+python scripts/check_site.py --write-results
+```
+
+The page remains readable without JavaScript. CI checks the committed HTML and fails if a generated number is edited independently of its data source.
 
 When the original manuscript checkout is available, use:
 
@@ -51,6 +75,6 @@ When the original manuscript checkout is available, use:
 python scripts/check_site.py --manuscript-root /path/to/manuscript
 ```
 
-This additionally checks source-file hashes, actual manuscript figure inclusion, time-pair labels, active table selection, and every published numeric value against the uncommented LaTeX tables. The script also detects an adjacent manuscript checkout automatically. In a standalone public clone it reports that only released hashes and result structure were checked.
+This additionally checks source-file hashes, actual manuscript figure inclusion, time-pair labels, active table selection, and the benchmark values against the uncommented LaTeX tables. The script also detects an adjacent manuscript checkout automatically. In a standalone public clone it reports that released hashes, result structure and generated HTML were checked.
 
 The HTML/CSS and interaction code were written for this project. No external project-page template or analytics script is bundled.

@@ -19,11 +19,9 @@ Each module is independently installable with Python 3.11. Install only the modu
 
 ## Release scope
 
-This initial release covers **MNIST, FFHQ, and 2D synthetic trajectories**. It does not include the paper's ImageNet or robotic-control implementations.
+MIT-licensed source and training workflows for **MNIST, FFHQ, and 2D synthetic trajectories**. Train your own DFM checkpoints using the linked workflows. FFHQ uses the documented third-party ALAE model; ImageNet and robotics implementations are outside this release.
 
-**This is a source-and-training release; pretrained DFM checkpoints are not distributed.** Follow the [MNIST](image_generation/docs/datasets/mnist.md), [FFHQ](image_generation/docs/datasets/ffhq.md), or [trajectory](generation_trajectory/README.md) workflow to train your own models, then use the provided checkpoint sampling and evaluation commands.
-
-The source has been streamlined to the paper's grouped, class-conditioned DFM objective. Later guidance and self-consistency experiments are not part of this release. Public configurations are reconstructed from available source and manuscript settings. **Original paper checkpoints and exact historical run configurations are not included.** The project page's archived figures and reported metrics are not newly reproduced results from this release. See [verification and limitations](reproduction/README.md) before making numerical comparisons.
+The code implements the paper's grouped Sinkhorn drift (Appendix Algorithm 2). See the [reproduction guide](reproduction/README.md) for experiment protocols and the relationship between the published figures and the training configurations.
 
 ## Repository map
 

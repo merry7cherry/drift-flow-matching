@@ -25,5 +25,7 @@ jobs:
         run: python -m pytest image_generation/tests -q
       - name: Trajectory tests
         run: python -m unittest discover -s generation_trajectory/tests -v
-      - name: Check project-page assets
-        run: python scripts/check_site.py
+      - name: Check project-page assets and displayed results
+        run: |
+          python scripts/check_site.py
+          python -m unittest discover -s scripts -p "test_*.py" -v

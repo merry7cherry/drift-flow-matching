@@ -29,8 +29,6 @@ class DriftFlowMatchingConfig:
     P_std_t: float = 2.5
     P_mean_r: float = 1.0
     P_std_r: float = 2.5
-    norm_eps: float = 1e-4
-    norm_p: float = 0.0
     kernel_temp_pos: float = 0.01
     kernel_temp_neg: float = 0.01
     sinkhorn_iters: int = 5

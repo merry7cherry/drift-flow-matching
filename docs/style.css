@@ -98,10 +98,6 @@ label { display:flex; flex-direction:column; gap:6px; font-size:11px; font-weigh
 .trajectory-controls label { min-width:150px; }
 .dfm-control { margin-left:auto; color:var(--accent); }
 .dfm-control select { border-color:var(--accent); }
-.comparison-presets { display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin:20px 0; }
-.comparison-presets>span { font-size:11px; color:var(--muted); margin-right:2px; }
-.comparison-presets button { font-size:10px; background:white; border:1px solid var(--line); border-radius:18px; padding:8px 11px; }
-.comparison-presets button[aria-pressed="true"] { border-color:var(--accent); background:var(--wash); color:var(--accent); }
 .budget-note { font-size:12px; color:var(--accent); background:var(--wash); padding:11px 14px; border-radius:6px; margin-bottom:18px; }
 .trajectory-grid { display:grid; grid-template-columns:1fr 1fr .68fr; gap:14px; align-items:start; }
 .trajectory-grid figure { margin:0; min-width:0; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
@@ -131,7 +127,7 @@ th:first-child { text-align:left; }
 .ours { background:#f0f7f2; }
 .ours th { color:var(--accent); }
 .evidence-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
-.source-note { font-size:12px; padding:18px 20px; margin:24px 0 0; border-left:3px solid #b0c9bc; background:var(--wash); color:var(--muted); }
+
 .toolbar { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; }
 .toolbar>span { font-size:13px; color:var(--muted); }
 .image-frame { margin:0; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
@@ -167,7 +163,7 @@ footer a { color:var(--muted); }
   .training-demo { grid-template-columns:1fr; gap:24px; }.source-target { max-width:200px; }.training-explanation { display:grid; grid-template-columns:1fr 130px; gap:0 16px; }.training-explanation h3 { grid-column:1/-1; }.training-explanation p { font-size:13px; margin:0; }.source-target { margin:0; align-self:start; }.source-target figcaption { font-size:10px; }.figure-toolbar { padding:14px; }.training-figure>img { max-height:350px; }
   .inference { grid-template-columns:1fr; padding:24px; gap:20px; }.inference h3 { font-size:21px; }.theory { font-size:12px; }
   .demo-panel { padding:16px; }.demo-top { display:block; }.demo-top .segmented { display:flex; }.demo-top .segmented button { flex:1; padding:9px 8px; font-size:10px; }.dataset-label { width:100%; }.dataset-label select { width:100%; }
-  .trajectory-controls { gap:12px; }.reference-controls { display:grid; grid-template-columns:1fr 1fr; width:100%; gap:12px; }.trajectory-controls label { min-width:0; }.dfm-control { width:100%; margin-left:0; }.comparison-presets>span { width:100%; }.comparison-presets button { font-size:9px; padding:8px 9px; }
+  .trajectory-controls { gap:12px; }.reference-controls { display:grid; grid-template-columns:1fr 1fr; width:100%; gap:12px; }.trajectory-controls label { min-width:0; }.dfm-control { width:100%; margin-left:0; }
   .trajectory-grid { gap:10px; }.trajectory-grid figcaption { font-size:10px; padding:10px; }.trajectory-grid .target-figure { grid-template-columns:110px 1fr; }.target-figure p { font-size:10px; padding:8px; }.budget-note { font-size:11px; }.figure-reading { font-size:11px; }
   .metric-grid { grid-template-columns:1fr; gap:12px; }.metric-card { padding:20px; }.metric-values { font-size:30px; margin-top:10px; }.metric-card .card-kicker { margin-bottom:0; }.metric-card .small-note { margin-top:10px; }
   .evidence-grid,.code-grid { grid-template-columns:1fr; }.subsection-title { font-size:21px; }th,td { padding:10px 12px; }
@@ -175,3 +171,13 @@ footer a { color:var(--muted); }
   .code-grid article { padding:24px; }.code-grid h3 { font-size:22px; }pre { font-size:10px; padding:16px; }footer { padding:22px 20px 32px; gap:12px 20px; }footer span { width:100%; }
 }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+
+.path-equation { font-family:Georgia,serif; font-size:clamp(18px,2vw,24px); text-align:center; padding:16px; background:var(--wash); border-radius:8px; }
+.coverage { padding:16px; }
+.coverage h4 { margin:0 0 10px; color:var(--accent); font-size:12px; letter-spacing:1px; }
+.coverage h4:not(:first-child) { margin-top:20px; }
+.coverage-row { display:grid; grid-template-columns:repeat(4,minmax(175px,1fr)); min-width:720px; gap:12px; }
+.coverage-row figure { margin:0; }
+.coverage-row figcaption { font-size:11px; font-weight:650; text-align:center; padding-bottom:8px; }
+.coverage-row img { display:block; width:100%; height:auto; }
+.image-examples>p { color:var(--muted); font-size:14px; }

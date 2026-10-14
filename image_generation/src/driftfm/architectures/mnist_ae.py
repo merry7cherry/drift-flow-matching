@@ -5,7 +5,7 @@ import torch.nn as nn
 
 
 class MnistConvAE(nn.Module):
-    def __init__(self, latent_dim: int = 6) -> None:
+    def __init__(self, latent_dim: int = 16) -> None:
         super().__init__()
         self.latent_dim = latent_dim
         self.encoder = nn.Sequential(

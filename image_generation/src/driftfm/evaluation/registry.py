@@ -93,7 +93,7 @@ def evaluate_checkpoint(
 
     evaluator = get_evaluator(resolve_evaluator_name(active_experiment))
     active_experiment.evaluation.metrics = evaluator.validate_metrics(
-        active_experiment.evaluation.metrics or list(evaluator.supported_metrics)
+        active_experiment.evaluation.metrics or list(evaluator.default_metrics)
     )
     output_root = Path(output_dir) if output_dir is not None else resolved_checkpoint.resolve().parent
     output_root.mkdir(parents=True, exist_ok=True)

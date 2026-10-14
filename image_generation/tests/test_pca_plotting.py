@@ -84,22 +84,8 @@ class _FastUMAP:
         return centered[:, :2]
 
 
-class _FastTSNE:
-    def __init__(self, **kwargs) -> None:
-        self.kwargs = kwargs
-
-    def fit_transform(self, points: np.ndarray) -> np.ndarray:
-        centered = np.asarray(points, dtype=np.float32) - np.asarray(points, dtype=np.float32).mean(axis=0)
-        if centered.shape[1] == 1:
-            return np.concatenate([centered, np.zeros((centered.shape[0], 1), dtype=np.float32)], axis=1)
-        return centered[:, :2]
-
-
 @pytest.fixture
 def fast_projection_backends(monkeypatch: pytest.MonkeyPatch) -> None:
-    import sklearn.manifold
-
-    monkeypatch.setattr(sklearn.manifold, "TSNE", _FastTSNE)
     monkeypatch.setitem(sys.modules, "umap", SimpleNamespace(UMAP=_FastUMAP))
 
 
@@ -216,7 +202,7 @@ def test_write_projection_artifacts_emits_method_specific_families(
     }
 
     artifacts = projection.write_projection_artifacts(
-        methods=["tsne", "umap", "lda"],
+        methods=["pca", "umap"],
         fake_by_class=fake_by_class,
         real_by_class=real_by_class,
         class_names=class_names,
@@ -224,11 +210,8 @@ def test_write_projection_artifacts_emits_method_specific_families(
         random_state=123,
     )
 
-    assert set(artifacts) == {"tsne", "umap", "lda"}
-    assert artifacts["tsne"].real_fit_plot_path is None
-    assert artifacts["tsne"].real_fit_projection_path is None
+    assert set(artifacts) == {"pca", "umap"}
     assert artifacts["umap"].real_fit_plot_path is not None
-    assert artifacts["lda"].real_fit_plot_path is not None
 
     for method_name, method_artifacts in artifacts.items():
         projection_payload = json.loads(method_artifacts.projection_path.read_text(encoding="utf-8"))
@@ -239,7 +222,7 @@ def test_write_projection_artifacts_emits_method_specific_families(
         assert method_artifacts.real_only_plot_path.exists()
         assert method_artifacts.generated_only_plot_path.exists()
 
-    for method_name in ("umap", "lda"):
+    for method_name in ("pca", "umap"):
         real_fit_path = artifacts[method_name].real_fit_projection_path
         assert real_fit_path is not None
         real_fit_payload = json.loads(real_fit_path.read_text(encoding="utf-8"))

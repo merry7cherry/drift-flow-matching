@@ -35,7 +35,6 @@ from .latent import (
 )
 from .ot import compute_ot_distance
 
-_DEFAULT_FFHQ_EVAL_METRICS = ["latent_ot", "fid", "pca", "tsne", "umap", "lda"]
 _DEFAULT_ALAE_CKPT = "{runs_root}/ffhq_alae/latest/alae_ffhq.pt"
 _DEFAULT_REAL_SPLIT = "test"
 _VALID_REAL_SPLITS = {"train", "test"}
@@ -44,7 +43,8 @@ _FID_ARTIFACTS_FILENAME = "fid_artifacts.json"
 
 class FFHQEvaluator(CheckpointEvaluator):
     name = "ffhq"
-    supported_metrics = ("latent_ot", "fid", "pca", "tsne", "umap", "lda")
+    default_metrics = ("latent_ot", "fid")
+    supported_metrics = ("latent_ot", "fid", "pca", "umap")
 
     def evaluate(
         self,
@@ -55,7 +55,7 @@ class FFHQEvaluator(CheckpointEvaluator):
         output_dir: str | Path,
         num_sampling_steps: int,
     ) -> EvaluationResult:
-        metrics = experiment.evaluation.metrics or list(_DEFAULT_FFHQ_EVAL_METRICS)
+        metrics = experiment.evaluation.metrics or list(FFHQEvaluator.default_metrics)
         self.validate_metrics(metrics)
         params = dict(experiment.evaluation.params)
 
@@ -283,10 +283,10 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--fid-num-workers", type=int, default=0)
     parser.add_argument("--save-size", type=int, default=1024)
     parser.add_argument("--reuse-images", action="store_true")
-    parser.add_argument("--fid-decode-noise", action="store_true")
+    parser.add_argument("--fid-decode-noise", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--num-sampling-steps", nargs="+", type=int, default=[1, 2, 5, 10, 20, 50])
-    parser.add_argument("--metrics", nargs="*", default=list(_DEFAULT_FFHQ_EVAL_METRICS))
+    parser.add_argument("--metrics", nargs="*", default=list(FFHQEvaluator.default_metrics))
     parser.add_argument("--no-deterministic", action="store_true")
     return parser.parse_args()
 
@@ -547,7 +547,7 @@ def evaluate_ffhq_checkpoint(
         experiment.trainer.deterministic = bool(deterministic)
     runtime_roots = resolve_runtime_config(experiment.runtime)
     experiment.evaluation.evaluator = "ffhq"
-    experiment.evaluation.metrics = list(metrics or _DEFAULT_FFHQ_EVAL_METRICS)
+    experiment.evaluation.metrics = list(metrics or FFHQEvaluator.default_metrics)
     experiment.evaluation.params = {
         "real_split": _normalize_real_split(real_split),
         "device": device,

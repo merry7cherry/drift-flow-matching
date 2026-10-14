@@ -7,6 +7,7 @@ from typing import Any
 import yaml
 
 from ..utils import normalize_path, normalize_path_fields, resolve_runtime_config
+from .compat import normalize_architecture_params, normalize_method_params
 from .schemas import (
     ArchitectureSection,
     DatasetSection,
@@ -20,9 +21,14 @@ from .schemas import (
 
 def _coerce_named_section(section_type: type, payload: dict[str, Any] | None) -> Any:
     payload = payload or {}
+    params = dict(payload.get("params", {}))
+    if section_type is ArchitectureSection:
+        params = normalize_architecture_params(params)
+    elif section_type is MethodSection:
+        params = normalize_method_params(params)
     return section_type(
         name=str(payload["name"]),
-        params=dict(payload.get("params", {})),
+        params=params,
     )
 
 

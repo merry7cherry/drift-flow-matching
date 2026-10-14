@@ -6,6 +6,7 @@ from typing import Any
 import torch.nn as nn
 
 from ..config import ArchitectureSection
+from ..config.compat import normalize_architecture_params
 from ..data import TransportDataset
 from .conditional_time_mlp import ConditionalTimeMLP
 from .mnist_ae import MnistConvAE
@@ -21,6 +22,8 @@ def _resolve_context(
     if data_dim <= 0:
         raise ValueError("data_dim must be provided directly or via dataset context")
     num_classes = params.get("num_classes", dataset.num_classes if dataset is not None else None)
+    if num_classes is None or int(num_classes) <= 0:
+        raise ValueError("num_classes must be provided for class-conditional generation")
     return data_dim, num_classes
 
 
@@ -36,8 +39,7 @@ def _build_conditional_time_mlp(
     return ConditionalTimeMLP(
         data_dim=data_dim,
         hidden_sizes=hidden_sizes,
-        num_classes=None if num_classes is None else int(num_classes),
-        conditioning_mode=params.get("conditioning_mode"),
+        num_classes=int(num_classes),
         class_embedding_dim=int(params.get("class_embedding_dim", default_class_embedding_dim)),
         activation=str(params.get("activation", "silu")),
     )
@@ -48,7 +50,7 @@ def _build_mnist_conv_ae(
     dataset: TransportDataset | None,
 ) -> nn.Module:
     del dataset
-    return MnistConvAE(latent_dim=int(params.get("latent_dim", 6)))
+    return MnistConvAE(latent_dim=int(params.get("latent_dim", 16)))
 
 
 def _build_mnist_latent_mlp(
@@ -90,4 +92,4 @@ def create_architecture(
         factory = ARCHITECTURES[section.name]
     except KeyError as exc:
         raise KeyError(f"Unknown architecture: {section.name}") from exc
-    return factory(dict(section.params), dataset)
+    return factory(normalize_architecture_params(section.params), dataset)

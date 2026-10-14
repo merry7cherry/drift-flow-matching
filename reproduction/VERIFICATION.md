@@ -1,28 +1,23 @@
-# Release verification
+# Software verification
 
-Checked on 2026-10-04. This record describes software verification, not a rerun of the paper's full experiments.
+Checked on 2026-10-13 with Python 3.11.15, PyTorch 2.8.0, torchvision 0.23.0, NumPy 2.0.2 and Matplotlib 3.9.4 on macOS arm64. GitHub Actions runs the CPU checks on Ubuntu for each public commit.
 
-## Clean installation and CPU execution
+## Training and evaluation
 
-Both packages were installed together in a fresh Python 3.11.15 environment on macOS arm64 with PyTorch 2.8.0, torchvision 0.23.0, NumPy 2.0.2, and Matplotlib 3.9.4. The image module's `constraints-tested.txt` records these core versions. The GitHub Actions workflow repeats installation and tests on Ubuntu; consult the repository's Actions history for the current Linux result.
+- **140 image tests passed:** grouped drift math, preprocessing, MNIST 16-dimensional defaults, all evaluation entrypoints, explicit PCA/UMAP selection, checkpoint/config compatibility, EMA/RNG resume, and synthetic train/sample/evaluate workflows.
+- **7 trajectory tests passed:** DFM/FM/MeanFlow updates, checkpoint reload, matched source samples, singleton-group training and common plot bounds across methods/NFE.
+- The image simplification was compared against public commit `b8f287c` on a fixed fixture: loss, 524 gradient entries, grouped drift, NFE 1/2/5 samples, old-checkpoint samples and one AdamW update were bitwise equal.
+- DFM, FM and MeanFlow were compared against that same public version using seed 137, batch size 16 and four optimizer updates. Losses, parameters, NFE 1/2 states/times and old-checkpoint outputs were bitwise equal. Singleton-group drift is an intentional correction: it now yields conditional supervision instead of zero loss.
+- Installed trajectory CLI training with singleton groups covered all four datasets. Reloading from outside the checkout reproduced all arrays in eight trace files exactly.
 
-- Image module: **130 tests passed**, including grouped drift math, class labels, preprocessing, checkpoint resume/RNG recovery, portable evaluation paths, all CLI help entrypoints, and actual MNIST/ALAE decoding using small random test models. Multiprocess DataLoader tests require the operating system's normal shared-memory permissions.
-- Trajectory module: **5 tests passed**, including optimizer updates for DFM/FM/MeanFlow, checkpoint round trips, matched source samples, and load-only execution.
-- The installed `driftfm-smoke` command ran from outside the source checkout. It trained on synthetic latents, saved/reloaded an EMA checkpoint, sampled NFE 1/2, and calculated latent OT.
-- The installed `dfm-trajectories` command trained the supplied two-update smoke configuration from outside the source checkout. A subsequent load-only invocation produced exactly equal `times`, `states`, and `target_samples` arrays at NFE 1/2.
-
-## Cleanup equivalence
-
-The original class-only image implementation (`split_v0`) and the released implementation were compared on the same fixed CPU fixture. Loss, all 524 parameter-gradient entries, grouped Sinkhorn drift, and sampled outputs at NFE 1/2/5 were exactly equal. DFM, FM, and MeanFlow trajectory implementations were also compared against the recovered source on a four-update fixture: losses and final parameters matched exactly. These are bounded regression checks, not proof for every possible configuration.
+FFHQ evaluation defaults are shared by the general and dataset-specific entrypoints. Decoder noise is enabled by default, matching the supplied configuration; `--no-fid-decode-noise` disables decoder noise. DFM pretrained checkpoints are not distributed. See the [reproduction guide](README.md) for protocols and the relationship to the paper results.
 
 ## Project page
 
-The paper-aligned page revision was checked on 2026-10-05 UTC (2026-10-04 America/New_York). All **37 archived figure assets** match their provenance hashes: 28 trajectory/reference panels, five grouped-drift panels, and four FFHQ grids. Local page references, anchors, JavaScript syntax, time-pair labels, and all entries in `docs/assets/results.json` passed verification. The results data was compared with the active manuscript tables; all displayed tables received an independent scientific review.
+- **45 figure assets** checked against the original manuscript sources: 28 trajectory/Ground Truth panels, five grouped-drift panels, four FFHQ image grids and eight FFHQ PCA/UMAP panels.
+- FFHQ coverage labels follow the active paper's column captions (1/2/5/10); the manifest preserves original filename mappings and hashes. Ground Truth uses the paper's unchanged first-column panels.
+- HTML result cards and tables are generated from `docs/assets/results.json`. The FFHQ selector reads the generated table. Two regression tests cover visible-number drift and the paper's coverage mapping; source-data comparison also checks the active manuscript tables.
+- Browser checks covered 32 dataset/method/NFE combinations, DFM step comparison, all four FFHQ budgets, all four training time pairs and Ground Truth switching. No browser errors were observed. Desktop and 390-pixel layouts had no page-level horizontal overflow; wide figures and tables scroll inside their own regions.
+- Independent scientific and code reviews checked the method explanation, figure mapping, result order, configuration compatibility and evaluation defaults.
 
-Browser checks covered the default DFM 1/20-NFE comparison, independent DFM NFE selection, method-specific NFE options, all three comparison presets, all four target distributions, four training time pairs, FFHQ image/metric switching (including the explicit missing 10-NFE metrics), and BibTeX copying. Desktop and 390-pixel mobile layouts were inspected; neither had page-level horizontal overflow and no JavaScript errors were observed. Tables scroll within their own regions on small screens.
-
-The controls display archived paper figures, not live model inference. NFE counts function evaluations rather than wall-clock cost. ImageNet and robotics are shown as paper evidence and remain outside the initial implementation release. The page does not certify historical paired seeds or checkpoint identity.
-
-## Not verified by these checks
-
-Full MNIST/FFHQ training, full-budget synthetic comparisons, CUDA execution, and exact reproduction of historical paper metrics remain outside this verification. The original paper checkpoints and historical run manifests are not included. See the [reproduction scope](README.md) and dataset-specific protocols before comparing results.
+These checks establish bounded software behavior and fidelity to the paper's presentation. Full-budget benchmark training and CUDA execution were not rerun for this revision.

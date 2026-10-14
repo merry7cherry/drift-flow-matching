@@ -45,7 +45,7 @@ def test_shipped_configs_resolve_to_module_storage():
         loaded = load_experiment_config(root / 'configs/experiments' / f'{name}_driftfm.yaml')
         assert loaded.runtime.data_root == str(root / 'data')
         assert loaded.runtime.runs_root == str(root / 'runs')
-        assert loaded.method.params['drift_form'] == 'split_v0'
+        assert 'drift_form' not in loaded.method.params
         assert loaded.evaluation.num_sampling_steps == [1, 2, 5, 10, 20, 50]
 
 

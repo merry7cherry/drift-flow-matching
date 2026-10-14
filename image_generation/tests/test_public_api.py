@@ -24,7 +24,7 @@ def test_config_modules_export_method_fields() -> None:
     drift_cfg = config.DriftFlowMatchingConfig()
     assert drift_cfg.sinkhorn_iters >= 1
     assert drift_cfg.groups_per_class == 4
-    assert drift_cfg.drift_form == "split_v0"
+    assert not hasattr(drift_cfg, "drift_form")
     assert not hasattr(drift_cfg, "coupling")
     assert not hasattr(drift_cfg, "sinkhorn_marginal")
     assert not hasattr(drift_cfg, "unconditional_negatives_per_group")

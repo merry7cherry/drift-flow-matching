@@ -5,12 +5,7 @@ from typing import Tuple
 import torch
 
 from ..configs import IntegratorConfig
-from ..models.mlp import (
-    DriftFlowVelocityMLP,
-    MeanVelocityMLP,
-    VelocityMLP,
-)
-from ..simulation.integrators import EulerIntegrator
+from ..models.mlp import TwoTimeVelocityMLP
 
 
 def compute_model_trajectories(
@@ -19,15 +14,27 @@ def compute_model_trajectories(
     device: torch.device,
     integrator_config: IntegratorConfig,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Integrate the FM instantaneous velocity with explicit Euler steps."""
+    steps = integrator_config.num_steps
+    if steps < 1:
+        raise ValueError("steps must be a positive integer")
     model.eval()
-    integrator = EulerIntegrator(num_steps=integrator_config.num_steps)
     with torch.no_grad():
-        trajectory, times = integrator.integrate(model, x0.to(device), device)
+        x = x0.to(device)
+        batch_size, dim = x.shape
+        dt = 1.0 / steps
+        times = torch.linspace(0.0, 1.0, steps + 1, device=device)
+        trajectory = torch.zeros(steps + 1, batch_size, dim, device=device)
+        trajectory[0] = x
+        for step in range(steps):
+            t = torch.full((batch_size, 1), times[step], device=device)
+            x = x + dt * model(x, t)
+            trajectory[step + 1] = x
     return trajectory, times
 
 
 def compute_drift_flow_matching_trajectories(
-    model: DriftFlowVelocityMLP,
+    model: TwoTimeVelocityMLP,
     x0: torch.Tensor,
     device: torch.device,
     *,
@@ -78,7 +85,7 @@ def compute_drift_flow_matching_trajectories(
 
 
 def compute_mean_flow_trajectories(
-    model: MeanVelocityMLP,
+    model: TwoTimeVelocityMLP,
     x0: torch.Tensor,
     device: torch.device,
     *,

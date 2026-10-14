@@ -1,5 +1,4 @@
-# Reconstructed class-conditional DFM configuration.
-# Exact historical checkpoint and result provenance is not available in this release.
+# Class-conditional DFM; see reproduction/image_generation.md for the experiment recipe.
 runtime:
   data_root: ../../data
   runs_root: ../../runs

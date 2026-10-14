@@ -61,8 +61,8 @@ def parse_args(argv=None):
         parser.error("Unknown or empty methods")
     if not args.datasets or any(d not in DATASET_CONFIGS for d in args.datasets):
         parser.error("Unknown or empty datasets")
-    if "drift_flow_matching" in args.methods and not args.load_dir and (args.batch_size % 4 or args.batch_size < 8):
-        parser.error("DFM batch size must be divisible by 4, with at least 2 samples per group")
+    if "drift_flow_matching" in args.methods and not args.load_dir and args.batch_size % 4:
+        parser.error("DFM batch size must be divisible by 4")
     try:
         device = torch.device(args.device)
     except RuntimeError as error:
