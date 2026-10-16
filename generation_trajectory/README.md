@@ -1,97 +1,81 @@
 # Generation Trajectory
 
-A compact implementation of Drift Flow Matching (DFM), with Flow Matching and
-MeanFlow baselines, on the four 2D synthetic distributions used in the paper:
-checkerboard, letters F and M, and two moons. All data are generated in memory.
-
-The default runs one small DFM experiment on CPU. It saves a model checkpoint,
-actual sampler trajectories, and figures. No dataset download or cluster account
-is required.
+Train Drift Flow Matching (DFM) on four synthetic 2D targets: checkerboard,
+letters F and M, and two moons. The module includes Flow Matching and MeanFlow
+baselines. Data are generated in memory.
 
 ## Install
 
-Use Python 3.11 or 3.12. From this directory:
+Use Python 3.11. From the repository root:
 
 ```bash
-python -m venv .venv
+cd generation_trajectory
+python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e .
 ```
 
-The package pins PyTorch, NumPy, and Matplotlib versions. For CUDA, install the
-matching PyTorch 2.8.0 build for your machine before installing this package.
-The same commands and relative output directories work on a normal workstation.
+## Train and view trajectories
 
-## Quick start
+Run the two-moons demo on CPU with 1,000 optimizer updates:
 
 ```bash
-# One moon dataset, DFM, 1,000 optimizer updates, CPU; NFE 1 and 20.
 dfm-trajectories --output outputs/demo
-
-# Minimal execution check; not a trained-quality result.
-dfm-trajectories --config configs/smoke.json
 ```
 
-`python -m flowviz` is equivalent to `dfm-trajectories`. Useful flags include
-`--device cpu` / `--device cuda:0`, `--epochs`, `--steps-per-epoch`,
-`--batch-size`, `--lr`, `--nfe 1 2 5 20`, `--eval-samples`, `--seed`, and
-`--output`. `--threads` controls CPU intra-op threads (default: 1).
-DFM uses four time-pair groups: batch size must be a positive multiple of four.
-A batch of four gives one sample per group (conditional regression); larger groups
-estimate the distribution-level drift.
-JSON config values can be overridden with CLI flags.
+Open the NFE 1 and 20 figures to compare the learned sampling paths. The command
+also saves the trained checkpoint:
 
-## Generate from a saved model
+```text
+outputs/demo/
+  2d_circular_uniform_to_moon_drift_flow_matching_nfe_1.png
+  2d_circular_uniform_to_moon_drift_flow_matching_nfe_20.png
+  checkpoints/2d_circular_uniform_to_moon_drift_flow_matching.pt
+```
+
+## Sample the saved model
+
+Reuse that checkpoint to generate trajectories at additional NFE values:
 
 ```bash
 dfm-trajectories \
   --load-dir outputs/demo/checkpoints \
-  --datasets 2d_circular_uniform_to_moon \
-  --methods drift_flow_matching \
   --nfe 1 2 5 20 --output outputs/resampled
 ```
 
-This loads the checkpoint and does **no training**. Each dataset/method pair uses
-its own named `.pt` file. Checkpoints contain CPU tensor state dictionaries,
-architecture, training configuration, seed, and loss history. DFM checkpoints
-contain EMA inference weights; these files are for inference and replotting,
-not optimizer-resume training. Use the same evaluation seed and sample count to
-recover identical source points.
+The figures appear in `outputs/resampled/`. Checkpoints store the inference model
+and training settings; DFM uses EMA weights. Keep the evaluation seed and sample
+count unchanged to compare the same source points.
 
-## Compare the paper's trajectory tasks
+## Compare all four tasks
 
 ```bash
 dfm-trajectories --config configs/trajectory_comparison.json --device cuda:0
 ```
 
-This requests 40,000 updates **per method and dataset**. It is a full experiment,
-not the quick start. The configuration retains the research code's recovered
-training budget and method hyperparameters, with FM at NFE 50 and DFM/MeanFlow at
-NFE 1 and 20.
+This trains each of the 12 method/dataset combinations for 40,000 updates,
+evaluating FM at NFE 50 and DFM/MeanFlow at NFE 1 and 20. CUDA execution uses a
+matching PyTorch 2.8.0 CUDA build. The [protocol](docs/PROTOCOL.md) lists model,
+drift, and training settings.
 
-See the [protocol](docs/PROTOCOL.md) for model and drift settings, and the
-[release scope](../reproduction/README.md) for the relationship between new runs
-and archived paper results.
+## Read the outputs
 
-## Outputs and their meaning
+Each method/dataset produces a `.pt` checkpoint, `.png` figures, `.npz` traces,
+and a `.json` record of the checkpoint hash, evaluation settings, dataset
+parameters, and plot bounds.
 
-For each selected method/dataset:
+In each figure, blue points are source samples, red points are generated
+endpoints, and gray points represent the target distribution. Lines connect the
+saved sampler states. All selected methods and NFE share the source points and
+coordinate bounds for a given dataset and evaluation seed. `--max-display`
+controls how many paths/source points are drawn; all generated endpoints and
+target points are shown.
 
-- `checkpoints/<dataset>_<method>.pt`: inference model and training metadata.
-- `<dataset>_<method>_nfe_<N>.npz`: `times` of shape `[N+1]`, `states` of shape
-  `[N+1, samples, 2]`, and `target_samples` of shape `[samples, 2]`.
-- Corresponding `.png`: blue source, red generated endpoint, gray target samples,
-  and lines connecting the actual sampler states. Axes are fixed across all
-  selected methods and NFE for each dataset. Only the selected `--max-display` paths/source points are drawn;
-  all generated endpoints and target samples are shown.
-- `<dataset>_<method>.json`: complete checkpoint metadata, evaluation settings,
-  dataset parameters, checkpoint SHA-256, shared plot bounds, and trace filenames.
-
-Target samples show a distribution. They are **not pathwise ground truth** for
-the generated trajectories. All selected methods and NFE use the same source
-samples for a given evaluation seed. A line between two saved states is only a
-visual connection, not an additional network evaluation.
+Each `.npz` contains `times` with shape `[NFE+1]`, `states` with shape
+`[NFE+1, samples, 2]`, and `target_samples` with shape `[samples, 2]`.
+`states[k]` is the sampler state at `times[k]`; target samples describe the
+reference distribution. Each interval uses one network evaluation.
 
 ```python
 import numpy as np
@@ -99,19 +83,24 @@ trace = np.load("outputs/demo/2d_circular_uniform_to_moon_drift_flow_matching_nf
 print(trace["states"].shape, trace["times"])
 ```
 
-## Code and checks
+## Options and checks
 
-The DFM objective is in `src/flowviz/pipelines/training.py`; the sampler is in
-`src/flowviz/pipelines/inference.py`. Method hyperparameters are in
-`src/flowviz/configs/methods.py`, and dataset definitions are in
-`src/flowviz/data/synthetic.py`. The drift computation follows Appendix
-Algorithm 2: grouped cross-minus-self Sinkhorn drift with Euclidean-distance
-logits. DFM regresses a stopped-gradient state target.
+`dfm-trajectories --help` lists the training, dataset, method, NFE, and device
+options. JSON values can be overridden with CLI flags. DFM uses four time-pair
+groups, so batch size must be a positive multiple of four. `--threads` sets CPU
+intra-op threads (default: 1). `python -m flowviz` is an equivalent entrypoint.
 
 ```bash
+# Two-update installation check.
+dfm-trajectories --config configs/smoke.json
+
+# Drift, training, checkpoint, trajectory, and CLI regression tests.
 python -m unittest discover -s tests -v
 ```
 
-The tests cover drift invariances, single-sample groups, optimizer updates,
-checkpoint round trips, matched-source exports, shared comparison axes,
-load-without-training, and CLI validation.
+## Code
+
+The [training objectives](src/flowviz/pipelines/training.py) and
+[samplers](src/flowviz/pipelines/inference.py) implement the three methods.
+[Method settings](src/flowviz/configs/methods.py) and
+[synthetic data](src/flowviz/data/synthetic.py) define the experiments.

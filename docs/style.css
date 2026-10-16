@@ -108,7 +108,6 @@ label { display:flex; flex-direction:column; gap:6px; font-size:11px; font-weigh
 .target-figure p { font-size:10px; line-height:1.55; color:var(--muted); padding:0 12px; margin:10px 0 12px; }
 .figure-reading { font-size:12px; color:var(--muted); margin:18px 0 12px; }
 .small-note { font-size:12px; line-height:1.65; color:var(--muted); margin:16px 0 0; }
-.demo-panel .small-note { font-size:11px; }
 .text-link { display:inline-block; margin-top:16px; font-weight:650; font-size:14px; }
 .metric-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:28px 0 38px; }
 .metric-card { padding:22px; background:var(--wash); border-radius:var(--radius); border:1px solid var(--line); }
@@ -134,7 +133,6 @@ th:first-child { text-align:left; }
 .image-frame img { width:100%; height:auto; display:block; }
 .image-frame figcaption { display:flex; justify-content:space-between; gap:30px; padding:18px 22px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; }
 .image-frame figcaption>span:first-child { font-weight:700; color:var(--accent); white-space:nowrap; }
-.image-frame figcaption>span:last-child { max-width:690px; }
 .code-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
 .code-grid article { border:1px solid var(--line); border-radius:var(--radius); padding:30px; }
 .code-number { font-size:12px; color:var(--accent); display:block; margin-bottom:18px; }

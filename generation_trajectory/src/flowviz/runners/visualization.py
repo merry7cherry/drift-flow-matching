@@ -129,8 +129,7 @@ def run_visualization_experiments(
                 "evaluation": {"seed": run_config.seed, "samples": eval_config.eval_samples, "nfe": list(nfe_values), "device": str(device)},
                 "dataset": {"name": key, "kwargs": dict(dataset_config.kwargs)},
                 "traces": [f"{stem}.npz" for stem, _, _ in trajectories],
-                "trace_semantics": "states[k] is the learned sampler state at times[k]; target_samples are unpaired reference samples, not pathwise ground truth",
-                "provenance": "New run from the public implementation; not a recovered original paper checkpoint.",
+                "trace_semantics": "states[k] is the learned sampler state at times[k]; target_samples describe the reference distribution",
             }
             method_runs.append((trajectories, METHOD_LABELS[method], filename, manifest))
 

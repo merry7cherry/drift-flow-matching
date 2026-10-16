@@ -12,6 +12,4 @@ The image module has one training objective and one conditional latent MLP, with
 | `evaluation` | Dataset-specific metrics and optional visualization |
 | `tasks` | Train, sample, evaluate, preprocessing and a small CPU smoke command |
 
-No site-specific runtime is required. Relative config paths use the configuration file as their anchor; relative command-line paths use the working directory. Configurations stored in checkpoints contain resolved absolute paths. Independent sampling only requires a generator checkpoint and, for image output, its matching decoder. Evaluation additionally requires the appropriate reference data.
-
-The image and generation-trajectory modules are separately installable. Neither module needs the other's environment or data.
+Start with `tasks/train.py`, which loads the configuration, constructs the data, model and method, and runs the trainer. `tasks/sample.py` loads a generator checkpoint and its matching decoder for image output. `tasks/evaluate.py` evaluates a checkpoint against the dataset's reference split.

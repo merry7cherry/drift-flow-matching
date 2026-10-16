@@ -49,10 +49,10 @@
       <p class="method-key">DFM learns transport between marginal distributions using a drift objective. Endpoint pairs construct the path samples; the loss matches their distributions within each time-pair group.</p>
       <div class="training-demo">
         <div class="training-explanation"><h3>Keep each marginal problem together.</h3><p>Each time pair defines its own marginal transport problem. Compute drift within that group, using the grouped Sinkhorn field in Algorithm 2 of the paper.</p><figure class="source-target"><img src="assets/group-source-target.jpg" width="1500" height="1452" loading="lazy" alt="Source and target endpoint distributions in the paper’s grouped drift illustration"><figcaption>Endpoint distributions: source in blue, target in red.</figcaption></figure></div>
-        <figure class="training-figure"><div class="figure-toolbar"><label for="training-pair">Inspect a training time pair</label><select id="training-pair"><option value="early">Early · (0.05, 0.30)</option><option value="wide">Wide · (0.20, 0.80)</option><option value="middle">Middle · (0.35, 0.65)</option><option value="late">Late · (0.70, 0.95)</option></select></div><img id="training-image" src="assets/group-early.jpg" width="1500" height="1452" loading="lazy" alt="Grouped training drift for time pair t = 0.05, r = 0.30"><figcaption><span class="legend"><span><i class="dot red"></i>Target marginal p<sub>r</sub></span><span><i class="dot green"></i>Predicted marginal q</span><span>↘ Training drift V</span></span><span id="training-caption" aria-live="polite">The drift V provides a training correction; it is not the inference velocity u.</span></figcaption></figure>
+        <figure class="training-figure"><div class="figure-toolbar"><label for="training-pair">Inspect a training time pair</label><select id="training-pair"><option value="early">Early · (0.05, 0.30)</option><option value="wide">Wide · (0.20, 0.80)</option><option value="middle">Middle · (0.35, 0.65)</option><option value="late">Late · (0.70, 0.95)</option></select></div><img id="training-image" src="assets/group-early.jpg" width="1500" height="1452" loading="lazy" alt="Grouped training drift for time pair t = 0.05, r = 0.30"><figcaption><span class="legend"><span><i class="dot red"></i>Target marginal p<sub>r</sub></span><span><i class="dot green"></i>Predicted marginal q</span><span>↘ Training drift V</span></span><span id="training-caption" aria-live="polite">Arrows show the training drift V. Inference uses the learned transport u.</span></figcaption></figure>
       </div>
       <div class="inference"><div><p class="eyebrow">At inference</p><h3>Choose the grid. Reuse the model.</h3><p>A single interval from 0 to 1 gives direct generation. A finer time grid composes the same learned transport across intermediate states. Each call evaluates u<sub>θ</sub> once.</p></div><div class="inference-paths"><div><span>1 evaluation</span><div class="time-path"><b>0</b><i></i><b>1</b></div></div><div><span>Multiple evaluations</span><div class="time-path"><b>0</b><i></i><b>t₁</b><i></i><b>t₂</b><i></i><b>…</b><i></i><b>1</b></div></div></div></div>
-      <details class="theory"><summary>What does the theoretical connection establish?</summary><p>The constructed marginal path admits explicit Wasserstein bounds. Under the paper’s first-order consistency and regularity assumptions, the learned mean velocity approaches the local Flow Matching velocity as the interval shrinks. The implementation follows Appendix Algorithm 2: Euclidean-distance logits, Sinkhorn balancing, and row-normalized weights instantiate the general drift objective.</p></details>
+      <details class="theory"><summary>Connection to Flow Matching</summary><p>The constructed marginal path admits explicit Wasserstein bounds. Under the paper’s first-order consistency and regularity assumptions, the learned mean velocity approaches the local Flow Matching velocity as the interval shrinks.</p></details>
     </section>
 
     <section id="trajectories" class="section" aria-labelledby="trajectory-title">
@@ -64,9 +64,7 @@
         <p class="budget-note" id="comparison-budget" aria-live="polite">Same method · DFM at 1 NFE and 20 NFE.</p>
         <div class="trajectory-grid"><figure><figcaption id="reference-title">DFM · 1 NFE</figcaption><img id="reference-image" src="assets/moon-drift_flow_matching_steps_1.jpg" width="1600" height="1421" loading="lazy" alt="One-step DFM trajectories toward two moons"></figure><figure class="dfm-figure"><figcaption id="dfm-title">DFM · 20 NFE</figcaption><img id="dfm-image" src="assets/moon-drift_flow_matching_steps_20.jpg" width="1600" height="1421" loading="lazy" alt="Twenty-step DFM trajectories toward two moons"></figure><figure class="target-figure"><figcaption>Ground Truth</figcaption><img id="target-image" src="assets/moon-ground_truth.jpg" width="1600" height="1421" loading="lazy" alt="Two moons target distribution and reference interpolation"><p id="target-caption">Red endpoints show target samples; lines are reference interpolations.</p></figure></div>
         <p class="figure-reading">Blue points show source samples. Red points show generated endpoints in the method panels and target samples in Ground Truth.</p>
-        <p class="small-note" id="trajectory-caption" aria-live="polite">Controls switch archived paper figures; they do not run model inference.</p>
       </div>
-      <details class="theory"><summary>About these paper figures</summary><p>Controls display the paper’s figures at their reported NFE: DFM and MeanFlow 1 / 20, Drift Model 1, Flow Matching 50. Ground Truth contains target samples and reference interpolations. One-step lines connect endpoints; NFE counts model evaluations. See <a href="https://github.com/merry7cherry/drift-flow-matching/blob/main/reproduction/assets.md">figure sources and provenance</a>.</p></details>
       <a class="text-link" href="https://github.com/merry7cherry/drift-flow-matching/tree/main/generation_trajectory">Train a model and record your own trajectories <span aria-hidden="true">→</span></a>
     </section>
 
@@ -80,7 +78,7 @@
 </div>
 <!-- /results:cards -->
       <h3 class="subsection-title">MNIST and FFHQ</h3>
-      <p>Complete class-conditional comparison from the paper. EMD is squared Wasserstein-2 distance in latent space. FFHQ FID compares generated and real latents decoded by the same frozen ALAE decoder.</p>
+      <p>Class-conditional generation on MNIST and FFHQ. EMD is squared Wasserstein-2 distance in latent space. FFHQ FID compares generated and real latents decoded by the same frozen ALAE decoder.</p>
       <div class="table-scroll" tabindex="0" role="region" aria-label="MNIST and FFHQ results">
         <table><caption>MNIST / FFHQ results</caption><thead><tr><th scope="col">Method</th><th scope="col">NFE</th><th scope="col">MNIST EMD ↓</th><th scope="col">MNIST accuracy ↑</th><th scope="col">FFHQ EMD ↓</th><th scope="col">FFHQ FID ↓</th></tr></thead>
         <!-- results:image-table -->
@@ -98,7 +96,7 @@
         </table>
       </div>
       <h3 class="subsection-title" id="coverage">How does the generated distribution change?</h3>
-      <p>The paper’s FFHQ latent-space figure shows broader coverage with more inference steps. PCA and UMAP compare generated and real latent distributions, using the panel order and NFE labels from the paper.</p>
+      <p>More inference steps improve FFHQ latent-space coverage. PCA and UMAP compare the generated and real latent distributions.</p>
       <div class="table-scroll coverage" tabindex="0" role="region" aria-label="FFHQ distribution coverage at different NFE">
         <h4>PCA</h4>
         <div class="coverage-row">
@@ -115,7 +113,7 @@
           <figure><figcaption>10 NFE · DFM</figcaption><img src="assets/ffhq-umap-nfe-10.jpg" width="1600" height="1192" loading="lazy" alt="Paper FFHQ UMAP distribution comparison, 10 NFE · DFM"></figure>
         </div>
       </div>
-      <p class="small-note">The first column is the paper’s one-step Drift Model reference. Class colors and real/generated markers follow the legends in the original figures.</p>
+      <p class="small-note">Filled markers show generated latents; outlined markers show real latents. Colors and shapes denote classes.</p>
       <div id="images" class="image-examples">
         <h3 class="subsection-title">FFHQ image samples</h3>
         <p>Class-conditional samples from the paper appendix, decoded at 1024 × 1024.</p>
@@ -123,7 +121,7 @@
         <!-- results:ffhq-metric -->
 <p class="budget-note" id="ffhq-metric" aria-live="polite">FFHQ · 1 NFE · FID 116.2 · EMD 225.5</p>
 <!-- /results:ffhq-metric -->
-        <figure class="image-frame"><img id="ffhq-image" src="assets/ffhq-nfe-1.jpg" width="1800" height="1026" loading="lazy" alt="FFHQ class-conditional generated samples at one inference step"><figcaption><span id="image-caption" aria-live="polite">FFHQ · 1 NFE</span><span>Qualitative examples; the grids are not paired by verified seed. The table reports the quantitative comparison.</span></figcaption></figure>
+        <figure class="image-frame"><img id="ffhq-image" src="assets/ffhq-nfe-1.jpg" width="1800" height="1026" loading="lazy" alt="FFHQ class-conditional generated samples at one inference step"><figcaption><span id="image-caption" aria-live="polite">FFHQ · 1 NFE</span></figcaption></figure>
       </div>
       <h3 class="subsection-title">ImageNet and robotic control</h3>
       <p>The same inference-budget question extends to larger-scale image generation and action generation.</p>
@@ -155,10 +153,10 @@
           <p class="small-note">Success rates average the last 10 checkpoints.</p>
         </div>
       </div>
-      <p class="small-note">Results and figures from the paper. <a href="assets/results.json">Result data</a> · <a href="https://arxiv.org/abs/2605.17244">Full experiments and comparisons</a></p>
+      <p class="small-note"><a href="assets/results.json">Result data</a> · <a href="https://arxiv.org/abs/2605.17244">Full experiments and comparisons</a></p>
     </section>
 
-    <section id="code" class="section" aria-labelledby="code-title"><p class="eyebrow">05 / Code &amp; reproduction</p><h2 id="code-title">Two ways to start.</h2><div class="code-grid"><article><span class="code-number">01</span><h3>Image generation</h3><p>Prepare MNIST or FFHQ latents, train DFM, sample at a chosen NFE, and evaluate with the documented protocol.</p><a class="text-link" href="https://github.com/merry7cherry/drift-flow-matching/tree/main/image_generation">Installation &amp; training →</a></article><article><span class="code-number">02</span><h3>Generation trajectories</h3><p>Start with a small CPU example. Train DFM, FM, or MeanFlow, save a model, and record inference trajectories at different budgets.</p><a class="text-link" href="https://github.com/merry7cherry/drift-flow-matching/tree/main/generation_trajectory">Run the example →</a></article></div><p class="small-note">MIT-licensed training code for MNIST, FFHQ, and synthetic trajectories. Train your own DFM checkpoints; FFHQ uses the documented ALAE assets. ImageNet and robotics are paper results outside this code release. <a href="https://github.com/merry7cherry/drift-flow-matching/blob/main/reproduction/README.md">Reproduction guide</a>.</p></section>
+    <section id="code" class="section" aria-labelledby="code-title"><p class="eyebrow">05 / Code &amp; reproduction</p><h2 id="code-title">Two ways to start.</h2><div class="code-grid"><article><span class="code-number">01</span><h3>Image generation</h3><p>Prepare MNIST or FFHQ latents, train DFM, sample at a chosen NFE, and evaluate with the documented protocol.</p><a class="text-link" href="https://github.com/merry7cherry/drift-flow-matching/tree/main/image_generation">Installation &amp; training →</a></article><article><span class="code-number">02</span><h3>Generation trajectories</h3><p>Start with a small CPU example. Train DFM, FM, or MeanFlow, save a model, and record inference trajectories at different budgets.</p><a class="text-link" href="https://github.com/merry7cherry/drift-flow-matching/tree/main/generation_trajectory">Run the example →</a></article></div><p class="small-note">MIT-licensed training code for MNIST, FFHQ, and synthetic trajectories. <a href="https://github.com/merry7cherry/drift-flow-matching/blob/main/reproduction/README.md">Training guide</a>.</p></section>
 
     <section id="citation" class="section citation" aria-labelledby="citation-title"><div class="citation-heading"><h2 id="citation-title">Citation</h2><button type="button" id="copy-citation">Copy BibTeX</button></div><pre><code id="bibtex">@article{ma2026drift,
   title   = {Drift Flow Matching},

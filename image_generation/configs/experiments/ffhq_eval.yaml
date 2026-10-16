@@ -1,11 +1,11 @@
-# Class-conditional DFM; see reproduction/image_generation.md for the experiment recipe.
+# FFHQ workflow: ../../docs/datasets/ffhq.md
 runtime:
   data_root: ../../data
   runs_root: ../../runs
 
 evaluation:
   evaluator: ffhq
-  num_sampling_steps: [20]
+  num_sampling_steps: [1, 2, 5]
   metrics: [latent_ot, fid]
   params:
     real_split: test

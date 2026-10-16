@@ -1,4 +1,4 @@
-# Class-conditional DFM; see reproduction/image_generation.md for the experiment recipe.
+# MNIST workflow: ../../docs/datasets/mnist.md
 runtime:
   data_root: ../../data
   runs_root: ../../runs

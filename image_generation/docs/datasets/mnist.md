@@ -12,7 +12,7 @@ driftfm-mnist-encode-latents --data-dir data/mnist \
   --ae-ckpt runs/mnist_ae/latest/ae_final.pt --device cuda
 ```
 
-`--download` explicitly permits MNIST acquisition through torchvision. Omit it when the data is already present. Change the training budget/device for a local software check as needed; doing so changes the experiment. The paper specifies a 16-dimensional MNIST representation. The encoder schedule is 200 epochs.
+Omit `--download` when MNIST is already present. The autoencoder uses the paper's 16-dimensional representation and trains for 200 epochs.
 
 The encoder writes `ae_final.pt`; latent encoding writes `train_latents.npy`, `train_labels.npy`, `test_latents.npy`, and `test_labels.npy` next to it. Latents are floating-point arrays `(N,D)`, labels are integer arrays `(N,)` in `0..9`. Every class must have samples.
 
@@ -29,10 +29,10 @@ driftfm-evaluate --checkpoint runs/mnist_drift/mnist_dfm/checkpoint_final.pt \
   --config configs/experiments/mnist_eval.yaml
 ```
 
-Keep the concrete autoencoder checkpoint fixed between encoding, training, image sampling and evaluation. A different latent dimension or encoder state defines a different representation. The generator architecture derives its latent dimension from the data.
+The supplied generator configuration uses batch size 16,000 and 200 epochs of 100 optimizer steps. Use the same autoencoder checkpoint for encoding, image sampling and evaluation. The generator derives its latent dimension from the data.
 
-The default metrics are latent OT, decoded image OT, and classifier accuracy. Evaluation uses the test latent pool. Image OT is computed on flattened image pixels with the configured distance/solver. If the configured MNIST classifier checkpoint is absent, the evaluator trains its auxiliary classifier using the locally staged MNIST training data and saves it. For a comparable result, record and reuse that exact classifier.
+The default metrics are latent OT, image OT, and classifier accuracy at NFE 1, 2 and 5. Latent OT compares generated and held-out test latents. Image OT compares decoded generated images with original MNIST test images in flattened pixel space. Both use EMD with squared Euclidean cost (`W₂²`), averaged across classes. If the classifier checkpoint is absent, evaluation trains and saves a classifier using the local MNIST training data. Reuse that classifier for comparisons.
 
-An evaluation-only YAML can select `metrics: [latent_ot]` and a smaller `n_per_class`, but the MNIST evaluator still loads the matching decoder to write its class grid. Select `metrics: [latent_ot, image_ot, accuracy, umap]` to also produce the paper's MNIST latent visualization. PCA is also available explicitly.
+Select `metrics: [latent_ot, image_ot, accuracy, umap]` in `mnist_eval.yaml` to add the paper's MNIST latent visualization. PCA is also available. `metrics: [latent_ot]` selects only latent OT; evaluation also loads the matching decoder to write its class grid.
 
-See the [reproduction guide](../../../reproduction/image_generation.md) for the experiment recipe and result provenance.
+Evaluation saves one directory per NFE and an `evaluation_index.json`.

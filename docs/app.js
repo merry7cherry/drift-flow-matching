@@ -25,7 +25,7 @@
     const metric = ffhqMetrics[nfe];
     setText("ffhq-metric", metric
       ? `FFHQ · ${nfe} NFE · FID ${metric.fid} · EMD ${metric.emd}`
-      : "10 NFE · Qualitative samples; FID and EMD are not reported at this NFE.");
+      : "10 NFE · Qualitative samples");
   }));
 
   const datasetSelect = byId("dataset");
@@ -70,12 +70,11 @@
     setImage("reference-image", `assets/${sceneKey}-${method.asset(referenceNfe)}.jpg`, `${referenceLabel} generation trajectories toward ${scene}`);
     setImage("dfm-image", `assets/${sceneKey}-drift_flow_matching_steps_${dfmNfe}.jpg`, `DFM · ${dfmNfe} NFE generation trajectories toward ${scene}`);
     setImage("target-image", `assets/${sceneKey}-ground_truth.jpg`, `${scene} Ground Truth from the paper`);
-    setText("target-caption", `${scene} · Target samples and reference interpolations from the paper.`);
+    setText("target-caption", `${scene} · Target samples and reference interpolations.`);
     setText("mode-description", stepComparison ? "Compare DFM at 1 and 20 inference steps." : "Choose a reference method and each method’s inference budget.");
     setText("comparison-budget", stepComparison
       ? "DFM · 1 NFE → 20 NFE"
       : `${referenceNfe === dfmNfe ? "Equal" : "Different"} NFE · ${method.label}: ${referenceNfe} · DFM: ${dfmNfe}`);
-    setText("trajectory-caption", `${scene} · ${referenceLabel} compared with DFM · ${dfmNfe} NFE.`);
   }
   modeButtons.forEach(button => button.addEventListener("click", () => {
     mode = button.dataset.trajectoryMode;

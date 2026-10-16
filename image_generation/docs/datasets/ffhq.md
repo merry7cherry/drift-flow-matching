@@ -1,6 +1,6 @@
 # FFHQ image workflow
 
-FFHQ uses a frozen ALAE encoder/decoder and a six-class latent generator. ALAE training is outside this release. Obtain the dataset and official ALAE artifacts under their respective terms; no data or pretrained weights are included here.
+FFHQ uses a frozen ALAE encoder/decoder and a six-class latent generator. This workflow requires FFHQ images, class metadata and the official ALAE checkpoint. Run commands from `image_generation/` after installation with the `eval` extra.
 
 ## Prepare images and classes
 
@@ -18,7 +18,7 @@ male_children   male_adult   male_old
 female_children female_adult female_old
 ```
 
-The inherited grouping uses ages 0–19, 20–49, and 50+; these are data preprocessing categories. The manifest and split metadata are retained. The default materialization uses symlinks; use `--materialize-mode copy` when moving a self-contained dataset to another machine.
+The age groups are 0–19, 20–49, and 50+. The command saves the manifest and split metadata, and creates symlinks by default. Use `--materialize-mode copy` for a self-contained dataset.
 
 An optional helper supports the [FFHQ-Aging mirror](https://huggingface.co/datasets/NUS-SRI-2025/FFHQ-Aging-Dataset):
 
@@ -28,7 +28,7 @@ driftfm-ffhq-download-aging --image-dir data/ffhq_images \
   --manifest-out data/ffhq_manifest.csv --work-dir data/ffhq_download
 ```
 
-This can download a large dataset and is never invoked by the smoke check or training command. The generated manifest can be passed to the split command above. The helper deletes its downloaded ZIP archives after successful extraction unless `--keep-archives` is supplied.
+Pass the generated manifest to the split command above. Downloaded ZIP archives are deleted after successful extraction; use `--keep-archives` to retain them.
 
 ## Import ALAE and encode latents
 
@@ -44,13 +44,11 @@ driftfm-ffhq-encode-latents \
   --output-dir data/ffhq_latents_6class --device cuda --batch-size 8
 ```
 
-The import reads `configs/ffhq.yaml` and `training_artifacts/ffhq/last_checkpoint` with its referenced checkpoint, or accepts explicit `--official-config` and `--official-checkpoint` paths. It stores a self-contained inference checkpoint for this package. ALAE-derived implementation files retain the upstream Apache 2.0 notice.
+The import reads `configs/ffhq.yaml` and `training_artifacts/ffhq/last_checkpoint` with its referenced checkpoint, or accepts explicit `--official-config` and `--official-checkpoint` paths. It saves `alae_ffhq.pt` and updates the local `latest` marker used by the training and evaluation configurations.
 
-The encoder checks both splits, class folders, RGB channels and image size against the imported model. Each output NPZ contains the six keys above, with a floating-point `(N,D)` array per class. The standard ALAE FFHQ representation uses `D=512`.
+Encoding writes `train_latents_by_class.npz` and `test_latents_by_class.npz`. Each contains the six class keys above, with a floating-point `(N,D)` array per class. The standard ALAE FFHQ representation uses `D=512`.
 
 ## Train and generate
-
-Set `evaluation.params.alae_ckpt` in both FFHQ configs to `../../runs/ffhq_alae/imported/alae_ffhq.pt` (relative to those YAML files), or supply the absolute checkpoint path. Then:
 
 ```bash
 driftfm-train --config configs/experiments/ffhq_driftfm.yaml
@@ -63,15 +61,15 @@ driftfm-evaluate --checkpoint runs/ffhq_drift/ffhq_dfm/checkpoint_final.pt \
   --config configs/experiments/ffhq_eval.yaml
 ```
 
-The full configuration uses batch size 3,072 and 200 epochs of 100 optimizer steps. Hardware requirements and runtime have not been measured for this public release. A small CPU test is available through `driftfm-smoke`; it uses four-dimensional synthetic data, not FFHQ images.
+The supplied generator configuration uses batch size 3,072 and 200 epochs of 100 optimizer steps. Use the same frozen ALAE checkpoint for encoding, image sampling and evaluation.
 
 ## Evaluation semantics
 
-The default metrics are per-class latent OT and FID. Select `metrics: [latent_ot, fid, pca, umap]` to also produce the paper's latent visualizations. The reference pool is explicitly the held-out test latent NPZ. There is no fallback to training data if that test file is missing.
+The default metrics are latent OT and FID at NFE 1, 2 and 5. Latent OT compares generated samples with held-out test latents using EMD with squared Euclidean cost (`W₂²`), averaged across classes. Select `metrics: [latent_ot, fid, pca, umap]` in `ffhq_eval.yaml` to add the paper's latent visualizations.
 
-**The inherited FID compares decoded generated latents against ALAE reconstructions of the real test latents, not raw original FFHQ images.** Both distributions use the same frozen decoder. Its result is not interchangeable with raw-image-reference FFHQ FID. Decoder noise is enabled by default for both real and generated FID images, with recorded seed, in the YAML configuration and the standalone evaluator. Use `--no-fid-decode-noise` with `driftfm-eval-ffhq` to disable it explicitly; `--fid-decode-noise` remains available. The sample CLI's presentation grids use `noise=False`.
+FID compares generated samples with reconstructions of held-out real latents, decoded by the same frozen ALAE model. Decoder noise is enabled for both by default. Use `--no-fid-decode-noise` with `driftfm-eval-ffhq` to disable it. The sample command uses deterministic decoding for its image grids.
 
-Real decoded image caches are reused only when the recorded source/decoder/seed/settings and actual image counts match. Each NFE has separate generated-image artifacts. For latent-only evaluation, remove `fid` from an evaluation configuration or run:
+Evaluation saves one directory per NFE and an `evaluation_index.json`. For latent-only evaluation, select `metrics: [latent_ot]` or run:
 
 ```bash
 driftfm-eval-ffhq --checkpoint /path/to/generator.pt \
@@ -79,4 +77,4 @@ driftfm-eval-ffhq --checkpoint /path/to/generator.pt \
   --metrics latent_ot --num-sampling-steps 1 2 5 --device cpu
 ```
 
-A full FID run may download the evaluator's Inception weights. See the [reproduction guide](../../../reproduction/image_generation.md) for the experiment recipe and result provenance.
+A full FID run may download the evaluator's Inception weights.

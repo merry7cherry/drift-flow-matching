@@ -1,11 +1,11 @@
-# Class-conditional DFM; see reproduction/image_generation.md for the experiment recipe.
+# MNIST workflow: ../../docs/datasets/mnist.md
 runtime:
   data_root: ../../data
   runs_root: ../../runs
 
 evaluation:
   evaluator: mnist
-  num_sampling_steps: [20]
+  num_sampling_steps: [1, 2, 5]
   metrics: [latent_ot, image_ot, accuracy]
   params:
     ae_ckpt: "{runs_root}/mnist_ae/latest/ae_final.pt"

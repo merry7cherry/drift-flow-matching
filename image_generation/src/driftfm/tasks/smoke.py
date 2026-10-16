@@ -48,7 +48,7 @@ def run_smoke(output_dir: str | Path) -> Path:
     result = evaluate_checkpoint(checkpoint, output_dir=output / "evaluation")
     report = output / "smoke_result.json"
     report.write_text(json.dumps({
-        "scope": "synthetic six-class four-dimensional latents; software check, not FFHQ image quality",
+        "scope": "synthetic six-class four-dimensional latents",
         "checkpoint": str(checkpoint), "evaluation": str(result.output_path), "metrics": result.summary,
     }, indent=2) + "\n")
     return report

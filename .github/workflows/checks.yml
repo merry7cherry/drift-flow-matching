@@ -25,6 +25,11 @@ jobs:
         run: python -m pytest image_generation/tests -q
       - name: Trajectory tests
         run: python -m unittest discover -s generation_trajectory/tests -v
+      - name: Run installed command-line workflows
+        run: |
+          driftfm-smoke --output-dir "$RUNNER_TEMP/dfm-image-smoke"
+          dfm-trajectories --config generation_trajectory/configs/smoke.json --output "$RUNNER_TEMP/dfm-trajectory-smoke"
+          dfm-trajectories --config generation_trajectory/configs/smoke.json --load-dir "$RUNNER_TEMP/dfm-trajectory-smoke/checkpoints" --nfe 1 2 5 --output "$RUNNER_TEMP/dfm-trajectory-reloaded"
       - name: Check project-page assets and displayed results
         run: |
           python scripts/check_site.py
