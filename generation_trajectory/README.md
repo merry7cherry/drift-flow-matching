@@ -44,9 +44,8 @@ dfm-trajectories \
   --nfe 1 2 5 20 --output outputs/resampled
 ```
 
-The figures appear in `outputs/resampled/`. Checkpoints store the inference model
-and training settings; DFM uses EMA weights. Keep the evaluation seed and sample
-count unchanged to compare the same source points.
+The figures appear in `outputs/resampled/`. DFM uses EMA weights. Keep the
+evaluation seed and sample count unchanged to compare the same source points.
 
 ## Compare all four tasks
 
@@ -61,9 +60,7 @@ drift, and training settings.
 
 ## Read the outputs
 
-Each method/dataset produces a `.pt` checkpoint, `.png` figures, `.npz` traces,
-and a `.json` record of the checkpoint hash, evaluation settings, dataset
-parameters, and plot bounds.
+Each method/dataset saves a `.pt` checkpoint, `.png` figures, and `.npz` traces.
 
 In each figure, blue points are source samples, red points are generated
 endpoints, and gray points represent the target distribution. Lines connect the
@@ -83,20 +80,11 @@ trace = np.load("outputs/demo/2d_circular_uniform_to_moon_drift_flow_matching_nf
 print(trace["states"].shape, trace["times"])
 ```
 
-## Options and checks
+## Options
 
 `dfm-trajectories --help` lists the training, dataset, method, NFE, and device
 options. JSON values can be overridden with CLI flags. DFM uses four time-pair
-groups, so batch size must be a positive multiple of four. `--threads` sets CPU
-intra-op threads (default: 1). `python -m flowviz` is an equivalent entrypoint.
-
-```bash
-# Two-update installation check.
-dfm-trajectories --config configs/smoke.json
-
-# Drift, training, checkpoint, trajectory, and CLI regression tests.
-python -m unittest discover -s tests -v
-```
+groups, so batch size must be a positive multiple of four.
 
 ## Code
 

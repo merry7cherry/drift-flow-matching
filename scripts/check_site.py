@@ -212,7 +212,7 @@ def check_results(manuscript):
     assert data['mnist_ffhq']['source'] == data['imagenet']['source'] == RESULT_SOURCES['generation_table']
     assert data['robotics']['source'] == RESULT_SOURCES['robotics_table']
     for section in ('mnist_ffhq', 'imagenet', 'robotics'):
-        assert data[section]['scope'] and data[section]['release_scope'] and data[section]['protocol'], section
+        assert data[section]['protocol'], section
 
     image_rows = data['mnist_ffhq']['rows']
     image_columns = ('mnist_emd', 'mnist_accuracy_percent', 'ffhq_emd', 'ffhq_fid')

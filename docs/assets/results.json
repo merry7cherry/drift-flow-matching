@@ -1,6 +1,5 @@
 {
   "schema_version": 1,
-  "measurement_origin": "Values reported in the active manuscript tables; not re-evaluated for the project page.",
   "sources": {
     "generation_table": {
       "path": "tab/tab_combine.tex",
@@ -18,11 +17,9 @@
   "mnist_ffhq": {
     "source": "tab/tab_combine.tex",
     "table_label": "tab:mnist_ffhq_comparison",
-    "scope": "Complete eight-row MNIST and FFHQ comparison from the active manuscript table.",
-    "release_scope": "MNIST and FFHQ implementation included; original image checkpoints and complete historical run provenance are not included.",
     "protocol": {
       "mnist": "Class-conditional generation in a learned 16-dimensional autoencoder latent space. EMD is average per-class squared 2-Wasserstein distance between test and generated latents. Accuracy uses a classifier trained on the MNIST training split.",
-      "ffhq": "Six-class generation in frozen 512-dimensional ALAE latent space. Latent EMD and FID are reported; FID compares generated and real latents decoded by the same frozen ALAE decoder at 1024 x 1024, not raw-image-reference FID."
+      "ffhq": "Six-class generation in frozen 512-dimensional ALAE latent space. Latent EMD and FID are reported; FID compares generated and real latents decoded by the same frozen ALAE decoder at 1024 x 1024."
     },
     "metrics": {
       "mnist_emd": {
@@ -113,8 +110,6 @@
   "imagenet": {
     "source": "tab/tab_combine.tex",
     "table_label": "tab:image256",
-    "scope": "DFM rows only from the active ImageNet 256 x 256 comparison.",
-    "release_scope": "Paper result; ImageNet implementation and checkpoints are outside this code release.",
     "protocol": "ImageNet-1k 256 x 256 synthesis using a pretrained VAE tokenizer with 32 x 32 x 4 latents and a latent-MAE feature-space DFM objective. FID and IS are evaluated on 50,000 randomly generated images, following the Drift Model protocol.",
     "model": "DFM, L/2",
     "parameters_millions": 463,
@@ -154,8 +149,6 @@
   "robotics": {
     "source": "tab/tab_robotic.tex",
     "table_label": "tab:robotics_control",
-    "scope": "Two representative DFM Policy task-setting rows; not the complete robotics table.",
-    "release_scope": "Paper result; robotics implementation and checkpoints are outside this code release.",
     "protocol": "The core policy is replaced with DFM under the Diffusion Policy and Drift Policy experimental setting. DFM loss uses raw control representations. Reported success rates average the last 10 checkpoints.",
     "method": "Drift Flow Matching Policy",
     "metric": {

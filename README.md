@@ -2,7 +2,7 @@
 
 **NeurIPS 2026** · Chenrui Ma, Xi Xiao, Lin Zhao, Tianyang Wang, Ferdinando Fioretto, Yanning Shen
 
-[Project page](https://merry7cherry.github.io/drift-flow-matching/) · [Paper](https://arxiv.org/abs/2605.17244) · [Training guide](reproduction/README.md)
+[Project page](https://merry7cherry.github.io/drift-flow-matching/) · [Paper](https://arxiv.org/abs/2605.17244)
 
 Drift Flow Matching (DFM) learns transport between pairs of intermediate marginal distributions using a distribution-level drift objective. A two-time model supports direct one-step generation and multi-step refinement with the same parameters.
 
@@ -21,8 +21,6 @@ cd drift-flow-matching
 | --- | --- | --- |
 | **Image generation** | Prepare MNIST / FFHQ latents, train DFM, sample and evaluate | [Installation and dataset guides](image_generation/README.md) |
 | **Generation trajectories** | Run a CPU demo, then compare DFM, Flow Matching and MeanFlow | [Generate your first figure](generation_trajectory/README.md) |
-
-Each module installs independently and implements the grouped Sinkhorn drift in Appendix Algorithm 2. Pretrained DFM checkpoints are not provided; the workflows train and save your own models.
 
 ## Citation
 

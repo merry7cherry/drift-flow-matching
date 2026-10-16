@@ -1,6 +1,6 @@
 # Drift Flow Matching implementation
 
-The public implementation uses the paper's fixed-class drift construction. Each conditional MLP receives `u(x_t, t, h, conditioning)`, where `h = r - t` and `conditioning.class_labels` contains the class indices. This is an equivalent coordinate system for the ordered time pair `(t, r)`.
+DFM uses the paper's fixed-class drift construction. The conditional MLP predicts `u(x_t, t, h, c)` for class `c`, where `h = r - t` represents the interval between the ordered times `(t, r)`.
 
 For a class-balanced batch, the method partitions each class into `groups_per_class` subgroups. A subgroup index shares a sampled pair `0 <= t <= r <= 1` across classes, while each transport problem uses samples from one class only. Time values follow the configured logit-normal laws.
 
@@ -12,8 +12,6 @@ For each group:
 4. Let `drift = projection(y,x_r) - projection(y,y)`.
 5. Regress `y` to the stop-gradient target `y + drift`.
 
-This is the grouped Sinkhorn implementation in the paper's Appendix **Algorithm 2**: kernel logits are `-torch.cdist(source, target) / temperature` (Euclidean distance), with 20 Sinkhorn iterations in the supplied image configurations and row normalization of the resulting plan. `norm_p=0`, as supplied, gives mean squared Euclidean error summed over latent coordinates. EMA is maintained by the trainer and used for sampling/evaluation.
+This is the grouped Sinkhorn implementation in the paper's Appendix **Algorithm 2**: kernel logits are `-torch.cdist(source, target) / temperature` (Euclidean distance), with 20 Sinkhorn iterations in the supplied image configurations and row normalization of the resulting plan. The loss is squared Euclidean error, summed over latent coordinates and averaged over samples.
 
 Sampling uses `N` uniform intervals from 0 to 1 and applies `x_next = x + h u(x,t,h,c)` once per interval. NFE therefore equals `N`. Generation uses explicit class labels.
-
-See the [MNIST](../datasets/mnist.md) and [FFHQ](../datasets/ffhq.md) workflows for training and evaluation commands.

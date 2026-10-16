@@ -71,7 +71,6 @@
     setImage("dfm-image", `assets/${sceneKey}-drift_flow_matching_steps_${dfmNfe}.jpg`, `DFM · ${dfmNfe} NFE generation trajectories toward ${scene}`);
     setImage("target-image", `assets/${sceneKey}-ground_truth.jpg`, `${scene} Ground Truth from the paper`);
     setText("target-caption", `${scene} · Target samples and reference interpolations.`);
-    setText("mode-description", stepComparison ? "Compare DFM at 1 and 20 inference steps." : "Choose a reference method and each method’s inference budget.");
     setText("comparison-budget", stepComparison
       ? "DFM · 1 NFE → 20 NFE"
       : `${referenceNfe === dfmNfe ? "Equal" : "Different"} NFE · ${method.label}: ${referenceNfe} · DFM: ${dfmNfe}`);
@@ -97,7 +96,6 @@
     const pair = trainingSelect.value;
     const [t, r] = trainingPairs[pair];
     setImage("training-image", `assets/group-${pair}.jpg`, `Grouped training drift for time pair t = ${t}, r = ${r}`);
-    setText("training-caption", `(t, r) = (${t}, ${r}) · Arrows show the training drift V. Inference uses the learned transport u.`);
   }
   trainingSelect.addEventListener("change", updateTrainingPair);
   updateTrainingPair();

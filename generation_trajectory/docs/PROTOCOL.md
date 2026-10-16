@@ -26,23 +26,13 @@ source/target endpoints, training constructs `x_t = (1-t)x_0 + t*x_1` and
 The target is `stopgrad(x_hat_r + V)`. The loss averages the squared residual norm
 across samples. Drift is computed separately within each group.
 
-A group containing one source/target pair reduces to conditional endpoint
-regression: its drift is `x_r - x_hat_r`. Larger groups estimate the marginal
-transport signal. The default batch size is 128 (32 samples per group); the full
-comparison uses 512 (128 per group).
-
 Inference uses uniform intervals and the same two-time transport update. DFM and
 MeanFlow share the two-time MLP architecture, with separate training objectives
 and time conventions. FM learns instantaneous velocity and uses Euler sampling.
 
 ## Run settings
 
-| Configuration | Updates per method/task | Purpose |
-|---|---:|---|
-| `configs/smoke.json` | 2 | Installation check |
-| Default CLI | 1,000 | DFM two-moons demo |
-| `configs/trajectory_comparison.json` | 40,000 | Three methods on four tasks |
-
-The comparison uses 400 epochs, 100 steps per epoch, batch size 512, and Adam
+The default demo uses batch size 128 (32 samples per group). The full comparison
+uses 400 epochs, 100 steps per epoch, batch size 512 (128 per group), and Adam
 with learning rate 0.001. It evaluates FM at NFE 50 and DFM/MeanFlow at NFE 1 and 20.
 See the [module README](../README.md) for commands and output formats.
